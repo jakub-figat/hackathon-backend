@@ -26,6 +26,7 @@ line-length = 119
 [tool.isort]
 profile = "black"
 line_length = 119
+lines_after_imports = 2
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -2,11 +2,10 @@ import uuid
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declared_attr, as_declarative
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import as_declarative, declared_attr, sessionmaker
 
 from src.settings import settings
-
 
 engine = create_async_engine(url=settings.database_url, echo=True)
 Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False, class_=AsyncSession)
