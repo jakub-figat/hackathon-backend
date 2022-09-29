@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    container_name: backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - postgres
+    command: uvicorn --host 0.0.0.0 --port 8000 --reload
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+
+volumes:
+  pgdata:
