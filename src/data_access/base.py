@@ -56,7 +56,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
 
         return self._output_schema.from_orm(model)
 
-    async def get_many(self, limit: int = 50, offset: int = 50) -> list[OutputSchema]:
+    async def get_many(self, limit: int = 50, offset: int = 0) -> list[OutputSchema]:
         statement = select(self._model).limit(limit).offset(offset)
 
         return [self._output_schema.from_orm(model) for model in await self._session.scalars(statement)]
