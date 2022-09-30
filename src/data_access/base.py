@@ -51,10 +51,10 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
     async def get_by_id(self, id: UUID) -> OutputSchema:
         statement = select(self._model).where(self._model.id == id)
 
-        if (model := (await self._session.scalar(statement))) is not None:
-            return self._output_schema.from_orm(model)
+        if (model := (await self._session.scalar(statement))) is None:
+            raise ModelNotFound.from_id(id=id, model_name=self._model.__name__)
 
-        raise ModelNotFound.from_id(id=id, model_name=self._model.__name__)
+        return self._output_schema.from_orm(model)
 
     async def get_many(self, limit: int = 50, offset: int = 50) -> list[OutputSchema]:
         statement = select(self._model).limit(limit).offset(offset)
@@ -70,7 +70,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         except IntegrityError:
             raise ModelAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
 
-        return model
+        return self._output_schema.from_orm(model)
 
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
