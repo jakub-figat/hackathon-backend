@@ -2,8 +2,15 @@ import uuid
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import as_declarative, declared_attr, sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+)
+from sqlalchemy.orm import (
+    as_declarative,
+    declared_attr,
+    sessionmaker,
+)
 
 from src.settings import settings
 

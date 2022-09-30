@@ -1,6 +1,12 @@
-from fastapi import APIRouter, status
+from fastapi import (
+    APIRouter,
+    status,
+)
 
-from src.schemas.user import UserRegisterSchema, UserSchema
+from src.schemas.user import (
+    UserRegisterSchema,
+    UserSchema,
+)
 
 
 user_router = APIRouter(tags=["users"])

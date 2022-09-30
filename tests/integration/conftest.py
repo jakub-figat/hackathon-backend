@@ -1,10 +1,16 @@
 import asyncio
-from typing import AsyncIterable, Iterable
+from typing import (
+    AsyncIterable,
+    Iterable,
+)
 
 import pytest
-import pytest_asyncio
 from sqlalchemy.engine import create_engine
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine,
+)
 
 from src.db import Base
 from src.settings import settings
@@ -30,7 +36,7 @@ def test_database() -> None:
         connection.execute(f"drop database {settings.postgres_database}_test")
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest.fixture(scope="session")
 async def async_test_engine(test_database) -> AsyncIterable[AsyncEngine]:
     async_engine = create_async_engine(
         url=(
@@ -49,7 +55,7 @@ async def async_test_engine(test_database) -> AsyncIterable[AsyncEngine]:
     await async_engine.dispose()
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def async_test_session(async_test_engine: AsyncEngine, test_database) -> AsyncIterable[AsyncSession]:
     async with async_test_engine.connect() as connection:
         transaction = await connection.begin()

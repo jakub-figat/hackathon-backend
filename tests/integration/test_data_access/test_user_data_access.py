@@ -5,9 +5,15 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.data_access.base import ModelAlreadyExists, ModelNotFound
+from src.data_access.base import (
+    ModelAlreadyExists,
+    ModelNotFound,
+)
 from src.data_access.user import UserDataAccess
 from src.schemas.user import UserRegisterSchema
+
+
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture
