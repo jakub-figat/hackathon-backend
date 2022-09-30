@@ -9,6 +9,7 @@ from typing import (
 )
 from uuid import UUID
 
+from fastapi import Depends
 from pydantic.main import BaseModel
 from sqlalchemy import (
     delete,
@@ -17,6 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.deps import get_async_session
 from src.utils.schemas import BaseInputSchema
 
 
@@ -55,7 +57,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
     def _model(self) -> Type[Model]:
         pass
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession = Depends(get_async_session)) -> None:
         self._session = session
 
     async def get_by_id(self, id: UUID) -> OutputSchema:
