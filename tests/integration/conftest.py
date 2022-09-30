@@ -20,10 +20,7 @@ def event_loop() -> Iterable[asyncio.AbstractEventLoop]:
 @pytest.fixture(scope="session")
 def test_database() -> None:
     with create_engine(
-        url=(
-            f"postgresql://{settings.postgres_user}:{settings.postgres_password}"
-            f"@{settings.postgres_host}/{settings.postgres_database}"
-        )
+        url=(f"postgresql://{settings.postgres_user}:{settings.postgres_password}" f"@{settings.postgres_host}")
     ).connect() as connection:
         connection.execute("commit")
         connection.execute(f"create database {settings.postgres_database}_test")
@@ -38,23 +35,25 @@ async def async_test_engine(test_database) -> AsyncIterable[AsyncEngine]:
     async_engine = create_async_engine(
         url=(
             f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_password}"
-            f"@{settings.postgres_host}/{settings.postgres_database}"
+            f"@{settings.postgres_host}/{settings.postgres_database}_test"
         ),
     )
 
+    async with async_engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
     yield async_engine
+
+    async with async_engine.begin() as connection:
+        await connection.run_sync(Base.metadata.drop_all)
+
     await async_engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="function")
 async def async_test_session(async_test_engine: AsyncEngine, test_database) -> AsyncIterable[AsyncSession]:
-    async with async_test_engine.begin() as connection:
-        await connection.run_sync(Base.metadata.create_all)
+    async with async_test_engine.connect() as connection:
+        transaction = await connection.begin()
+        async with AsyncSession(bind=connection, expire_on_commit=False) as async_session:
+            yield async_session
 
-    async with AsyncSession(bind=async_test_engine, expire_on_commit=False) as async_session:
-        await async_session.begin()
-        yield async_session
-        await async_session.rollback()
-
-    async with async_test_engine.begin() as connection:
-        await connection.run_sync(Base.metadata.drop_all)
+        await transaction.rollback()
