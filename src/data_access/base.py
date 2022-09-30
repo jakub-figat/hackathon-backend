@@ -1,9 +1,19 @@
-from abc import ABC, abstractmethod
-from typing import Generic, Type, TypeVar
+from abc import (
+    ABC,
+    abstractmethod,
+)
+from typing import (
+    Generic,
+    Type,
+    TypeVar,
+)
 from uuid import UUID
 
 from pydantic.main import BaseModel
-from sqlalchemy import delete, select
+from sqlalchemy import (
+    delete,
+    select,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 

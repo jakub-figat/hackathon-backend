@@ -19,14 +19,12 @@ alembic-revision:
 alembic-upgrade:
 	docker-compose run --rm backend bash -c "alembic upgrade head"
 
-unit-test:
-	docker-compose run --rm --entrypoint "" backend bash -c "coverage run --source=src -m pytest tests/unit"
+test:
+	docker-compose run --rm backend bash -c "pytest"
 
 integration-test:
-	docker-compose run --rm backend bash -c "coverage run --source=src -m pytest tests/integration"
+	docker-compose run --rm backend bash -c "pytest --integration"
 
-test:
-	docker-compose run --rm backend bash -c "coverage run --source=src -m pytest tests"
 
 cov-html:
 	docker-compose run --rm --entrypoint "" backend bash -c "coverage html"

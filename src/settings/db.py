@@ -1,4 +1,7 @@
-from pydantic import BaseSettings, Field
+from pydantic import (
+    BaseSettings,
+    Field,
+)
 
 
 class DatabaseSettings(BaseSettings):
