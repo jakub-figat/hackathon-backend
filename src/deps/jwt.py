@@ -7,7 +7,7 @@ from fastapi import (
 from starlette import status
 
 from src.data_access.user import UserDataAccess
-from src.exceptions.data_access import ModelNotFound
+from src.exceptions.data_access import ObjectNotFound
 from src.schemas.user import UserSchema
 from src.utils.jwt import (
     InvalidAccessToken,
@@ -30,5 +30,5 @@ async def get_request_user(
 
     try:
         return UserSchema.from_orm(await user_data_access.get_by_id(id=user_id))
-    except ModelNotFound:
+    except ObjectNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The user does not exist.")

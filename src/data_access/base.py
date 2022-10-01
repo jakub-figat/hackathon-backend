@@ -20,8 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.deps.db import get_async_session
 from src.exceptions.data_access import (
-    ModelAlreadyExists,
-    ModelNotFound,
+    ObjectAlreadyExists,
+    ObjectNotFound,
 )
 from src.utils.schemas import BaseInputSchema
 
@@ -54,7 +54,8 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         statement = select(self._model).where(*[getattr(self._model, key) == value for key, value in kwargs.items()])
 
         if (model := (await self._session.scalar(statement))) is None:
-            raise ModelNotFound("...")
+            params = ", ".join(f"{key}={value}" for key, value in kwargs.items())
+            raise ObjectNotFound(f"The {self._model.__name__} with g{params} does not exist.")
 
         return self._output_schema.from_orm(model)
 
@@ -62,7 +63,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         statement = select(self._model).where(self._model.id == id)
 
         if (model := (await self._session.scalar(statement))) is None:
-            raise ModelNotFound.from_field(field_name="id", value=id, model_name=self._model.__name__)
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         return self._output_schema.from_orm(model)
 
@@ -78,13 +79,13 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         try:
             await self._session.commit()
         except IntegrityError:
-            raise ModelAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
+            raise ObjectAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
 
         return self._output_schema.from_orm(model)
 
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
         if (await self._session.scalar(select(self._model).where(self._model.id == id))) is None:
-            raise ModelNotFound.from_field(field_name="id", value=id, model_name=self._model.__name__)
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         await self._session.execute(statement)

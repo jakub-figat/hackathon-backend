@@ -6,8 +6,8 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.data_access.base import (
-    ModelAlreadyExists,
-    ModelNotFound,
+    ObjectAlreadyExists,
+    ObjectNotFound,
 )
 from src.data_access.user import UserDataAccess
 from src.schemas.user import UserRegisterSchema
@@ -68,7 +68,7 @@ async def test_user_data_access_create_and_delete_user(
 async def test_user_data_access_raises_model_not_found_when_user_does_not_exist(
     user_data_access: UserDataAccess,
 ) -> None:
-    with pytest.raises(ModelNotFound):
+    with pytest.raises(ObjectNotFound):
         await user_data_access.get_by_id(id=uuid.uuid4())
 
 
@@ -76,7 +76,7 @@ async def test_user_data_access_raises_model_not_found_when_user_does_not_exist(
 async def test_user_data_access_raises_model_not_found_when_deleting_not_existing_user(
     user_data_access: UserDataAccess,
 ) -> None:
-    with pytest.raises(ModelNotFound):
+    with pytest.raises(ObjectNotFound):
         await user_data_access.delete_by_id(id=uuid.uuid4())
 
 
@@ -85,5 +85,5 @@ async def test_user_data_access_raises_model_already_exists_when_email_is_alread
     register_schema: UserRegisterSchema, user_data_access: UserDataAccess
 ) -> None:
     await user_data_access.register_user(input_schema=register_schema)
-    with pytest.raises(ModelAlreadyExists):
+    with pytest.raises(ObjectAlreadyExists):
         await user_data_access.register_user(input_schema=register_schema)

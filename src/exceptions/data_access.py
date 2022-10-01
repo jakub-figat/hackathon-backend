@@ -1,15 +1,10 @@
-from typing import Any
-
-
 class DataAccessException(Exception):
-    pass
+    """Exception raised when a generic error occurs"""
 
 
-class ModelNotFound(DataAccessException):
-    @classmethod
-    def from_field(cls, field_name: str, value: Any, model_name: str) -> "ModelNotFound":
-        return cls(f"{model_name} with {field_name}={value} not found")
+class ObjectNotFound(DataAccessException):
+    """Exception raised when an object was not found"""
 
 
-class ModelAlreadyExists(DataAccessException):
-    pass
+class ObjectAlreadyExists(DataAccessException):
+    """Exception raised when an object already exists"""

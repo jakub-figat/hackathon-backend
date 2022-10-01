@@ -9,8 +9,8 @@ from fastapi import (
 
 from src.deps.jwt import get_request_user
 from src.exceptions.data_access import (
-    ModelAlreadyExists,
-    ModelNotFound,
+    ObjectAlreadyExists,
+    ObjectNotFound,
 )
 from src.schemas.user import (
     AccessTokenSchema,
@@ -29,7 +29,7 @@ user_router = APIRouter(tags=["users"])
 async def create_user(schema: UserRegisterSchema, user_service: UserService = Depends()) -> UserResponseSchema:
     try:
         return await user_service.register_user(input_schema=schema)
-    except ModelAlreadyExists:
+    except ObjectAlreadyExists:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The email is already in use.")
 
 
@@ -40,7 +40,7 @@ async def get_user(
     print(user.email)
     try:
         return await user_service.get_user(user_id=user_id)
-    except ModelNotFound:
+    except ObjectNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The user does not exist.")
 
 
@@ -48,5 +48,5 @@ async def get_user(
 async def login(schema: UserLoginSchema, user_service: UserService = Depends()) -> AccessTokenSchema:
     try:
         return await user_service.generate_access_token(login_schema=schema)
-    except ModelNotFound:
+    except ObjectNotFound:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid credentials.")
