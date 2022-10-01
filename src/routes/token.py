@@ -34,6 +34,6 @@ async def refresh_token_pair(
     response: Response, refresh_token: str = Cookie(...), token_service: TokenService = Depends()
 ) -> AccessTokenSchema:
     token_pair = token_service.refresh_token_pair(refresh_token=refresh_token)
-    response.set_cookie(key="refresh_token", value=token_pair.refresh_token)
+    response.set_cookie(key="refresh_token", value=token_pair.refresh_token, secure=True, httponly=True)
 
     return AccessTokenSchema(access_token=token_pair.access_token)

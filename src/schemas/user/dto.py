@@ -2,16 +2,17 @@ import datetime as dt
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel
 from pydantic.class_validators import validator
 from pydantic.fields import Field
 from pydantic.networks import EmailStr
+
+from src.schemas.base import BaseModel
 
 
 class UserRegisterSchema(BaseModel):
     email: EmailStr
     date_of_birth: dt.date
-    password: str
+    password: str = Field(..., min_length=8, max_length=35)
     password_2: str = Field(..., min_length=8, max_length=35)
 
     @validator("password_2")

@@ -2,4 +2,4 @@ from pydantic.env_settings import BaseSettings
 
 
 class GeneralSettings(BaseSettings):
-    allowed_hosts: list[str] = ["localhost"]
+    allowed_hosts: list[str] = ["*"]

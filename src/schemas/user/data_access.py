@@ -4,7 +4,6 @@ from uuid import UUID
 
 from pydantic import (
     EmailStr,
-    Field,
     validator,
 )
 
@@ -14,7 +13,7 @@ from src.utils.schemas import BaseInputSchema
 
 class UserInputSchema(BaseInputSchema):
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=35)
+    password: str
     date_of_birth: dt.date
 
     @validator("date_of_birth")

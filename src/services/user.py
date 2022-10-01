@@ -18,7 +18,7 @@ class UserService:
     async def register_user(self, input_schema: UserRegisterSchema) -> UserResponseSchema:
         input_schema.password = password_context.hash(input_schema.password)
         return UserResponseSchema.from_orm(
-            await self._user_data_access.register_user(input_schema=UserInputSchema.parse_obj(input_schema.dict()))
+            await self._user_data_access.register_user(input_schema=UserInputSchema.parse_obj(input_schema))
         )
 
     async def get_user(self, user_id: UUID) -> UserResponseSchema:
