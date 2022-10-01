@@ -2,7 +2,6 @@ import datetime as dt
 import uuid
 
 import pytest
-import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.data_access.base import (
@@ -26,12 +25,11 @@ def register_schema() -> UserRegisterSchema:
     )
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def user_data_access(async_test_session: AsyncSession) -> UserDataAccess:
     return UserDataAccess(session=async_test_session)
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_create_and_get_user_by_id(
     register_schema: UserRegisterSchema, user_data_access: UserDataAccess
 ) -> None:
@@ -40,13 +38,11 @@ async def test_user_data_access_create_and_get_user_by_id(
     assert user == user_from_db
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_get_returns_empty_list(user_data_access: UserDataAccess) -> None:
     users = await user_data_access.get_many()
     assert users == []
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_get_with_one_user(
     register_schema: UserRegisterSchema, user_data_access: UserDataAccess
 ) -> None:
@@ -55,7 +51,6 @@ async def test_user_data_access_get_with_one_user(
     assert len(users) == 1
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_create_and_delete_user(
     register_schema: UserRegisterSchema, user_data_access: UserDataAccess
 ) -> None:
@@ -64,7 +59,6 @@ async def test_user_data_access_create_and_delete_user(
     assert await user_data_access.get_many() == []
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_raises_model_not_found_when_user_does_not_exist(
     user_data_access: UserDataAccess,
 ) -> None:
@@ -72,7 +66,6 @@ async def test_user_data_access_raises_model_not_found_when_user_does_not_exist(
         await user_data_access.get_by_id(id=uuid.uuid4())
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_raises_model_not_found_when_deleting_not_existing_user(
     user_data_access: UserDataAccess,
 ) -> None:
@@ -80,7 +73,6 @@ async def test_user_data_access_raises_model_not_found_when_deleting_not_existin
         await user_data_access.delete_by_id(id=uuid.uuid4())
 
 
-@pytest.mark.asyncio
 async def test_user_data_access_raises_model_already_exists_when_email_is_already_occupied(
     register_schema: UserRegisterSchema, user_data_access: UserDataAccess
 ) -> None:

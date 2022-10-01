@@ -4,12 +4,9 @@ from fastapi import Depends
 
 from src.data_access.user import UserDataAccess
 from src.schemas.user import (
-    AccessTokenSchema,
-    UserLoginSchema,
     UserRegisterSchema,
     UserResponseSchema,
 )
-from src.utils.jwt import generate_jwt
 from src.utils.password import password_context
 
 
@@ -23,11 +20,3 @@ class UserService:
 
     async def get_user(self, user_id: UUID) -> UserResponseSchema:
         return UserResponseSchema.from_orm(await self._user_data_access.get_by_id(id=user_id))
-
-    async def generate_access_token(self, login_schema: UserLoginSchema) -> AccessTokenSchema:
-        user = await self._user_data_access.get_by(email=login_schema.email)
-
-        if not password_context.verify(secret=login_schema.password, hash=user.password):
-            raise Exception
-
-        return AccessTokenSchema(access_token=generate_jwt(user_schema=user))

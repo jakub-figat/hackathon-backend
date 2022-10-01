@@ -44,7 +44,7 @@ class UserRegisterSchema(UserInputSchema):
 
 class UserLoginSchema(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=35)
 
 
 class UserResponseSchema(BaseModel):
@@ -61,6 +61,11 @@ class UserSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TokenPairSchema(BaseModel):
+    access_token: str
+    refresh_token: str
 
 
 class AccessTokenSchema(BaseModel):

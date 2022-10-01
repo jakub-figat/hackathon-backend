@@ -55,7 +55,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
 
         if (model := (await self._session.scalar(statement))) is None:
             params = ", ".join(f"{key}={value}" for key, value in kwargs.items())
-            raise ObjectNotFound(f"The {self._model.__name__} with g{params} does not exist.")
+            raise ObjectNotFound(f"The {self._model.__name__} with {params} does not exist.")
 
         return self._output_schema.from_orm(model)
 

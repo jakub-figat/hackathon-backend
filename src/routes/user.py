@@ -7,17 +7,14 @@ from fastapi import (
     status,
 )
 
-from src.deps.jwt import get_request_user
+from src.deps.jwt import require_auth
 from src.exceptions.data_access import (
     ObjectAlreadyExists,
     ObjectNotFound,
 )
 from src.schemas.user import (
-    AccessTokenSchema,
-    UserLoginSchema,
     UserRegisterSchema,
     UserResponseSchema,
-    UserSchema,
 )
 from src.services.user import UserService
 
@@ -33,20 +30,14 @@ async def create_user(schema: UserRegisterSchema, user_service: UserService = De
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The email is already in use.")
 
 
-@user_router.get("/{user_id}/", status_code=status.HTTP_200_OK, response_model=UserResponseSchema)
-async def get_user(
-    user_id: UUID, user_service: UserService = Depends(), user: UserSchema = Depends(get_request_user)
-) -> UserResponseSchema:
-    print(user.email)
+@user_router.get(
+    "/{user_id}/",
+    status_code=status.HTTP_200_OK,
+    response_model=UserResponseSchema,
+    dependencies=[Depends(require_auth)],
+)
+async def get_user(user_id: UUID, user_service: UserService = Depends()) -> UserResponseSchema:
     try:
         return await user_service.get_user(user_id=user_id)
     except ObjectNotFound:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The user does not exist.")
-
-
-@user_router.post("/login/", status_code=status.HTTP_200_OK, response_model=AccessTokenSchema)
-async def login(schema: UserLoginSchema, user_service: UserService = Depends()) -> AccessTokenSchema:
-    try:
-        return await user_service.generate_access_token(login_schema=schema)
-    except ObjectNotFound:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid credentials.")
