@@ -42,6 +42,24 @@ async def test_user_data_access_get_returns_empty_list(user_data_access: UserDat
     assert users == []
 
 
+@pytest.mark.parametrize(
+    "data,match",
+    (
+        ({"id": "0ee1a2be-5031-4b42-b399-1a455c7a1390"}, r"id=0ee1a2be-5031-4b42-b399-1a455c7a1390"),
+        ({"email": "user@example.com"}, r"email=user@example.com"),
+        (
+            {"id": "0ee1a2be-5031-4b42-b399-1a455c7a1390", "email": "user@example.com"},
+            r"id=0ee1a2be-5031-4b42-b399-1a455c7a1390, email=user@example.com",
+        ),
+    ),
+)
+async def test_user_data_access_get_by_raises_object_not_found_exception(
+    data, match, user_data_access: UserDataAccess
+) -> None:
+    with pytest.raises(ObjectNotFound, match=match):
+        await user_data_access.get_by(**data)
+
+
 async def test_user_data_access_get_with_one_user(
     register_schema: UserInputSchema, user_data_access: UserDataAccess
 ) -> None:
