@@ -4,10 +4,15 @@ from uuid import UUID
 
 from pydantic.class_validators import validator
 from pydantic.fields import Field
-from pydantic.main import BaseModel
+from pydantic.main import BaseModel as PydanticBaseModel
 from pydantic.networks import EmailStr
 
 from src.utils.schemas import BaseInputSchema
+
+
+class BaseModel(PydanticBaseModel):
+    class Config:
+        orm_mode = True
 
 
 class UserInputSchema(BaseInputSchema):
@@ -37,10 +42,26 @@ class UserRegisterSchema(UserInputSchema):
         return password_2
 
 
-class UserSchema(BaseModel):
+class UserLoginSchema(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserResponseSchema(BaseModel):
     id: UUID
     email: str
     date_of_birth: dt.date
 
+
+class UserSchema(BaseModel):
+    id: UUID
+    email: str
+    password: str
+    date_of_birth: dt.date
+
     class Config:
         orm_mode = True
+
+
+class AccessTokenSchema(BaseModel):
+    access_token: str
