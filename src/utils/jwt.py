@@ -9,10 +9,7 @@ from jose import (
 )
 
 from src.enums.jwt import TokenType
-from src.schemas.user import (
-    TokenPairSchema,
-    UserSchema,
-)
+from src.schemas.jwt.dto import TokenPairSchema
 from src.settings import settings
 
 

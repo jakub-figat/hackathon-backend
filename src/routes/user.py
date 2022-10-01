@@ -12,7 +12,7 @@ from src.exceptions.data_access import (
     ObjectAlreadyExists,
     ObjectNotFound,
 )
-from src.schemas.user import (
+from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
 )

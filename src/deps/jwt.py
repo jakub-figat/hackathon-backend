@@ -8,7 +8,7 @@ from starlette import status
 
 from src.data_access.user import UserDataAccess
 from src.exceptions.data_access import ObjectNotFound
-from src.schemas.user import UserSchema
+from src.schemas.user.data_access import UserSchema
 from src.utils.jwt import (
     InvalidAccessToken,
     decode_jwt,

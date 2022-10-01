@@ -8,10 +8,8 @@ from fastapi import (
 )
 
 from src.exceptions.data_access import ObjectNotFound
-from src.schemas.user import (
-    AccessTokenSchema,
-    UserLoginSchema,
-)
+from src.schemas.jwt.dto import AccessTokenSchema
+from src.schemas.user.dto import UserLoginSchema
 from src.services.jwt import TokenService
 
 

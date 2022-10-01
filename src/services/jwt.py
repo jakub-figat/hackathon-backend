@@ -5,10 +5,8 @@ from src.data_access.user import UserDataAccess
 from src.enums.jwt import TokenType
 from src.exceptions.jwt import InvalidToken
 from src.exceptions.user import InvalidCredentials
-from src.schemas.user import (
-    TokenPairSchema,
-    UserLoginSchema,
-)
+from src.schemas.jwt.dto import TokenPairSchema
+from src.schemas.user.dto import UserLoginSchema
 from src.utils.jwt import (
     decode_jwt,
     generate_token_pair,
