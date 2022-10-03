@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -7,11 +5,9 @@ from fastapi import (
     status,
 )
 
-from src.deps.jwt import require_auth
-from src.exceptions.data_access import (
-    ObjectAlreadyExists,
-    ObjectNotFound,
-)
+from src.deps.jwt import get_request_user
+from src.exceptions.data_access import ObjectAlreadyExists
+from src.schemas.user.data_access import UserSchema
 from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
@@ -31,13 +27,9 @@ async def create_user(schema: UserRegisterSchema, user_service: UserService = De
 
 
 @user_router.get(
-    "/{user_id}/",
+    "/me/",
     status_code=status.HTTP_200_OK,
     response_model=UserResponseSchema,
-    dependencies=[Depends(require_auth)],
 )
-async def get_user(user_id: UUID, user_service: UserService = Depends()) -> UserResponseSchema:
-    try:
-        return await user_service.get_user(user_id=user_id)
-    except ObjectNotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="The user does not exist.")
+async def get_user(user: UserSchema = Depends(get_request_user)) -> UserResponseSchema:
+    return UserResponseSchema.parse_obj(user)
