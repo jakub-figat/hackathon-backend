@@ -6,6 +6,7 @@ from sqlalchemy import (
 )
 
 from src.db import Base
+from src.enums.roles import UserRole
 
 
 class UserModel(Base):
@@ -17,3 +18,4 @@ class UserModel(Base):
     phone_number = Column(String(50), nullable=True)
     image = Column(String(), nullable=True)
     is_verified = Column(Boolean(), nullable=False, default=False)
+    role = Column(String(20), nullable=False, default=UserRole.STANDARD.value)
