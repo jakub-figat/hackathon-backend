@@ -8,6 +8,7 @@ from fastapi import (
 )
 
 from src.exceptions.data_access import ObjectNotFound
+from src.exceptions.jwt import InvalidToken
 from src.schemas.jwt.dto import AccessTokenSchema
 from src.schemas.user.dto import UserLoginSchema
 from src.services.jwt import TokenService
@@ -31,9 +32,12 @@ async def login(
 
 @token_router.post("/refresh/", status_code=status.HTTP_200_OK, response_model=AccessTokenSchema)
 async def refresh_token_pair(
-    response: Response, refresh_token: str = Cookie(...), token_service: TokenService = Depends()
+    response: Response, refresh_token: str = Cookie(), token_service: TokenService = Depends()
 ) -> AccessTokenSchema:
-    token_pair = token_service.refresh_token_pair(refresh_token=refresh_token)
-    response.set_cookie(key="refresh_token", value=token_pair.refresh_token, secure=True, httponly=True)
+    try:
+        token_pair = await token_service.refresh_token_pair(refresh_token=refresh_token)
+        response.set_cookie(key="refresh_token", value=token_pair.refresh_token, secure=True, httponly=True)
+    except InvalidToken:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token.")
 
     return AccessTokenSchema(access_token=token_pair.access_token)

@@ -8,9 +8,9 @@ from starlette import status
 
 from src.data_access.user import UserDataAccess
 from src.exceptions.data_access import ObjectNotFound
+from src.exceptions.jwt import InvalidToken
 from src.schemas.user.data_access import UserSchema
 from src.utils.jwt import (
-    InvalidAccessToken,
     decode_jwt,
     oauth2_scheme,
 )
@@ -19,7 +19,7 @@ from src.utils.jwt import (
 def require_auth(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
     try:
         return decode_jwt(token=token)
-    except InvalidAccessToken:
+    except InvalidToken:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The provided token is invalid.")
 
 

@@ -9,15 +9,12 @@ from jose import (
 )
 
 from src.enums.jwt import TokenType
+from src.exceptions.jwt import InvalidToken
 from src.schemas.jwt.dto import TokenPairSchema
 from src.settings import settings
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token/login/")
-
-
-class InvalidAccessToken(Exception):
-    """Error raised when an invalid token was provided."""
 
 
 def generate_token_pair(user_id: uuid.UUID) -> TokenPairSchema:
@@ -48,11 +45,11 @@ def generate_token_pair(user_id: uuid.UUID) -> TokenPairSchema:
     )
 
 
-def decode_jwt(token: str, token_type: str = TokenType.access) -> dict[str, Any]:
+def decode_jwt(token: str, token_type: TokenType = TokenType.access) -> dict[str, Any]:
     try:
         token_data = jwt.decode(token=token, key=settings.token_secret_key)
-        if TokenType(token_data["type"]) != token_type:
+        if TokenType(token_data.get("type")) != token_type:
             raise JWTError("Invalid token type")
         return token_data
     except JWTError:
-        raise InvalidAccessToken("The provided token is invalid.")
+        raise InvalidToken("The provided token is invalid.")

@@ -21,6 +21,8 @@ def register_schema() -> UserInputSchema:
         email="test@test.com",
         date_of_birth=dt.date(2000, 1, 1),
         password="password12345",
+        first_name="Jacek",
+        last_name="Gardziel",
     )
 
 
