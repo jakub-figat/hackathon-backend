@@ -15,6 +15,8 @@ class UserInputSchema(BaseInputSchema):
     email: EmailStr
     password: str
     date_of_birth: dt.date
+    first_name: str
+    last_name: str
 
     @validator("date_of_birth")
     def validate_date_of_birth(cls, date_of_birth: dt.date) -> dt.date:
@@ -24,7 +26,13 @@ class UserInputSchema(BaseInputSchema):
         return date_of_birth
 
     def to_orm_kwargs(self) -> dict[str, Any]:
-        return {"email": self.email, "password": self.password, "date_of_birth": self.date_of_birth}
+        return {
+            "email": self.email,
+            "password": self.password,
+            "date_of_birth": self.date_of_birth,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+        }
 
 
 class UserSchema(BaseModel):
@@ -32,3 +40,5 @@ class UserSchema(BaseModel):
     email: str
     password: str
     date_of_birth: dt.date
+    first_name: str
+    last_name: str
