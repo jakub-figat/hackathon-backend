@@ -11,6 +11,7 @@ from src.schemas.user.data_access import UserSchema
 from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
+    UserUpdateSchema,
 )
 from src.services.user import UserService
 
@@ -33,3 +34,12 @@ async def create_user(schema: UserRegisterSchema, user_service: UserService = De
 )
 async def get_user(user: UserSchema = Depends(get_request_user)) -> UserResponseSchema:
     return UserResponseSchema.parse_obj(user)
+
+
+@user_router.put("/me/", status_code=status.HTTP_200_OK, response_model=UserResponseSchema)
+async def modify_user(
+    update_schema: UserUpdateSchema,
+    user: UserSchema = Depends(get_request_user),
+    user_service: UserService = Depends(),
+) -> UserResponseSchema:
+    return await user_service.update_user(update_schema=update_schema, user_id=user.id)

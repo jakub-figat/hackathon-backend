@@ -7,6 +7,7 @@ from src.schemas.user.data_access import UserInputSchema
 from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
+    UserUpdateSchema,
 )
 from src.utils.password import password_context
 
@@ -23,3 +24,8 @@ class UserService:
 
     async def get_user(self, user_id: UUID) -> UserResponseSchema:
         return UserResponseSchema.from_orm(await self._user_data_access.get_by_id(id=user_id))
+
+    async def update_user(self, update_schema: UserUpdateSchema, user_id: UUID) -> UserResponseSchema:
+        return UserResponseSchema.from_orm(
+            await self._user_data_access.update_user(update_schema=update_schema, user_id=user_id)
+        )

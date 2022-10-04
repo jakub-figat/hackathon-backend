@@ -35,6 +35,15 @@ class UserInputSchema(BaseInputSchema):
         }
 
 
+class UserUpdateSchema(BaseInputSchema):
+    date_of_birth: dt.date
+    first_name: str
+    last_name: str
+
+    def to_orm_kwargs(self) -> dict[str, Any]:
+        return {"first_name": self.first_name, "last_name": self.last_name, "date_of_birth": self.date_of_birth}
+
+
 class UserSchema(BaseModel):
     id: UUID
     email: str

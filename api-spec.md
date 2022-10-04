@@ -157,9 +157,9 @@ type Message = {
 ```
 
 Users
-GET /users/me/ -> User 
-PUT: UserUpdateInput /users/me/ -> User 
-POST: UseRegisterInput /users/register/ -> User 
+GET /users/me/ -> User DONE
+PUT: UserUpdateInput /users/me/ -> User DONE
+POST: UserRegisterInput /users/register/ -> User DONE
 
 Volunteer profile
 POST: VolunteerProfileCreate /volunteers/ -> VolunteerProfile
@@ -168,8 +168,8 @@ GET /volunteers/<uuid>/ -> VolunteerProfile
 PUT: VolunteerProfileInput /volunteers/<uuid>/ -> VolunteerProfile
 
 Tokens
-POST: UserLoginInput /token/login/ -> AccessTokenResponse (sets refresh_token of type string cookie)
-POST: Cookie: refresh_token /token/refresh/ -> AccessTokenResponse
+POST: UserLoginInput /token/login/ -> AccessTokenResponse (sets refresh_token of type string cookie) DONE
+POST: Cookie: refresh_token /token/refresh/ -> AccessTokenResponse DONE
 
 Needy tickets
 GET /tickets/ -> PaginatedResponse<Ticket>
@@ -187,3 +187,8 @@ GET /chats/<uuid>/messages/?PaginationParams -> PaginatedResponse<Message>
 
 Volunteer services
 GET /services/ -> Service[]
+
+phone confirmation, location, websocket chat, 
+
+Debilo: phone confirmation, chat & websocket
+Drugi debilo: user, token, volunteer, ticket

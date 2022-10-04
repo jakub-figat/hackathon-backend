@@ -9,7 +9,10 @@ from src.data_access.base import (
     ObjectNotFound,
 )
 from src.data_access.user import UserDataAccess
-from src.schemas.user.data_access import UserInputSchema
+from src.schemas.user.data_access import (
+    UserInputSchema,
+    UserUpdateSchema,
+)
 
 
 pytestmark = pytest.mark.integration
@@ -29,6 +32,14 @@ def register_schema() -> UserInputSchema:
 @pytest.fixture(scope="function")
 async def user_data_access(async_test_session: AsyncSession) -> UserDataAccess:
     return UserDataAccess(session=async_test_session)
+
+
+@pytest.fixture(scope="function")
+async def user_data_access_with_user(
+    register_schema: UserInputSchema, user_data_access: UserDataAccess
+) -> UserDataAccess:
+    await user_data_access.register_user(input_schema=register_schema)
+    return user_data_access
 
 
 async def test_user_data_access_create_and_get_user_by_id(
@@ -98,3 +109,19 @@ async def test_user_data_access_raises_model_already_exists_when_email_is_alread
     await user_data_access.register_user(input_schema=register_schema)
     with pytest.raises(ObjectAlreadyExists):
         await user_data_access.register_user(input_schema=register_schema)
+
+
+async def test_user_data_access_update_user(user_data_access_with_user: UserDataAccess) -> None:
+    update_schema = UserUpdateSchema(first_name="stachu", last_name="stachecki", date_of_birth=dt.date(2015, 1, 1))
+    user_from_db = (await user_data_access_with_user.get_many())[0]
+    user_schema = await user_data_access_with_user.update_user(update_schema=update_schema, user_id=user_from_db.id)
+
+    assert user_schema.first_name == update_schema.first_name
+    assert user_schema.last_name == update_schema.last_name
+    assert user_schema.date_of_birth == update_schema.date_of_birth
+
+
+async def test_user_data_access_update_user_raises_object_not_found(user_data_access: UserDataAccess) -> None:
+    update_schema = UserUpdateSchema(first_name="stachu", last_name="stachecki", date_of_birth=dt.date(2015, 1, 1))
+    with pytest.raises(ObjectNotFound):
+        await user_data_access.update_user(update_schema=update_schema, user_id=uuid.uuid4())

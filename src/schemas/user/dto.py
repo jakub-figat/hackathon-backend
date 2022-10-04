@@ -20,6 +20,16 @@ class UserLoginSchema(BaseModel):
     password: str = Field(..., min_length=8, max_length=35)
 
 
+class PasswordChangeSchema(BaseModel):
+    password: str
+
+
+class UserUpdateSchema(BaseModel):
+    date_of_birth: dt.date
+    first_name: str
+    last_name: str
+
+
 class UserResponseSchema(BaseModel):
     id: UUID
     email: EmailStr
