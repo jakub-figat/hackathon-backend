@@ -1,6 +1,10 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import Column
+from sqlalchemy import (
+    Column,
+    DateTime,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -22,6 +26,9 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on
 @as_declarative()
 class Base:
     id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @declared_attr
     def __tablename__(cls):

@@ -11,7 +11,7 @@ bash:
 	docker-compose run --rm --entrypoint "" backend bash
 
 db-shell:
-	docker-compose exec postgres bash -c "psql -U postgres"
+	docker-compose exec postgres bash -c "psql -U postgres postgres"
 
 alembic-revision:
 	docker-compose run --rm backend bash -c "alembic revision --autogenerate -m '$(name)'"

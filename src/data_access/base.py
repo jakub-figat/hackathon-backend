@@ -9,6 +9,7 @@ from typing import (
 )
 from uuid import UUID
 
+from fastapi import Depends
 from pydantic.main import BaseModel
 from sqlalchemy import (
     delete,
@@ -17,26 +18,17 @@ from sqlalchemy import (
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.deps.db import get_async_session
+from src.exceptions.data_access import (
+    ObjectAlreadyExists,
+    ObjectNotFound,
+)
 from src.utils.schemas import BaseInputSchema
 
 
 Model = TypeVar("Model")
 InputSchema = TypeVar("InputSchema", bound=BaseInputSchema)
 OutputSchema = TypeVar("OutputSchema", bound=BaseModel)
-
-
-class DataAccessException(Exception):
-    pass
-
-
-class ModelNotFound(DataAccessException):
-    @classmethod
-    def from_id(cls, id: UUID, model_name: str) -> "ModelNotFound":
-        return cls(f"{model_name} with id {id} not found")
-
-
-class ModelAlreadyExists(DataAccessException):
-    pass
 
 
 class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC):
@@ -55,14 +47,23 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
     def _model(self) -> Type[Model]:
         pass
 
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession = Depends(get_async_session)) -> None:
         self._session = session
+
+    async def get_by(self, **kwargs):
+        statement = select(self._model).where(*[getattr(self._model, key) == value for key, value in kwargs.items()])
+
+        if (model := (await self._session.scalar(statement))) is None:
+            params = ", ".join(f"{key}={value}" for key, value in kwargs.items())
+            raise ObjectNotFound(f"The {self._model.__name__} with {params} does not exist.")
+
+        return self._output_schema.from_orm(model)
 
     async def get_by_id(self, id: UUID) -> OutputSchema:
         statement = select(self._model).where(self._model.id == id)
 
         if (model := (await self._session.scalar(statement))) is None:
-            raise ModelNotFound.from_id(id=id, model_name=self._model.__name__)
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         return self._output_schema.from_orm(model)
 
@@ -78,13 +79,13 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         try:
             await self._session.commit()
         except IntegrityError:
-            raise ModelAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
+            raise ObjectAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
 
         return self._output_schema.from_orm(model)
 
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
         if (await self._session.scalar(select(self._model).where(self._model.id == id))) is None:
-            raise ModelNotFound.from_id(id=id, model_name=self._model.__name__)
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         await self._session.execute(statement)

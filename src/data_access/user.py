@@ -1,11 +1,12 @@
+from uuid import UUID
+
 from src.data_access.base import BaseAsyncPostgresDataAccess
 from src.models.user import UserModel
-from src.schemas.user import (
+from src.schemas.user.data_access import (
     UserInputSchema,
-    UserRegisterSchema,
     UserSchema,
+    UserUpdateSchema,
 )
-from src.utils.password import password_context
 
 
 class UserDataAccess(BaseAsyncPostgresDataAccess[UserModel, UserInputSchema, UserSchema]):
@@ -13,6 +14,14 @@ class UserDataAccess(BaseAsyncPostgresDataAccess[UserModel, UserInputSchema, Use
     _output_schema = UserSchema
     _model = UserModel
 
-    async def register_user(self, input_schema: UserRegisterSchema) -> UserSchema:
-        input_schema.password = password_context.hash(input_schema.password)
+    async def register_user(self, input_schema: UserInputSchema) -> UserSchema:
         return await self.create(input_schema=input_schema)
+
+    async def update_user(self, update_schema: UserUpdateSchema, user_id: UUID) -> UserSchema:
+        user = await self.get_by_id(id=user_id)
+        for key, value in update_schema.to_orm_kwargs().items():
+            setattr(user, key, value)
+
+        await self._session.commit()
+
+        return user
