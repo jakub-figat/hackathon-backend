@@ -26,6 +26,7 @@ pytest-cov = "^4.0.0"
 pytest-asyncio = "^0.19.0"
 pytest-mock = "^3.9.0"
 pytest-xdist = "^2.5.0"
+httpx = "^0.23.0"
 
 [tool.black]
 line-length = 119
