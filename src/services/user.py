@@ -29,5 +29,5 @@ class UserService:
     async def update_user(self, update_schema: UserUpdateSchema, user_id: UUID) -> UserResponseSchema:
         update_schema = data_access_schemas.UserUpdateSchema(**update_schema.dict())
         return UserResponseSchema.from_orm(
-            await self._user_data_access.update_user(update_schema=update_schema, user_id=user_id)
+            await self._user_data_access.update(update_schema=update_schema, id=user_id)
         )

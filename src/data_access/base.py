@@ -83,6 +83,19 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
 
         return self._output_schema.from_orm(model)
 
+    async def update(self, update_schema: InputSchema, id: UUID) -> OutputSchema:
+        statement = select(self._model).where(self._model.id == id)
+
+        if (model := (await self._session.scalar(statement))) is None:
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
+
+        for key, value in update_schema.to_orm_kwargs().items():
+            setattr(model, key, value)
+
+        await self._session.commit()
+
+        return self._output_schema.from_orm(model)
+
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
         if (await self._session.scalar(select(self._model).where(self._model.id == id))) is None:

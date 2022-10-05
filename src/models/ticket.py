@@ -1,7 +1,7 @@
-from geoalchemy2 import Geography
 from sqlalchemy import (
     Column,
     DateTime,
+    Float,
     ForeignKey,
     String,
     Table,
@@ -20,10 +20,11 @@ ticket_to_volunteer_service = Table(
 
 
 class TicketModel(Base):
-    location = Column(Geography("POINT"), nullable=False)
+    location_x = Column(Float, nullable=False)
+    location_y = Column(Float, nullable=False)
     city = Column(String(100), nullable=False)
     description = Column(String(1000), nullable=False)
     valid_until = Column(DateTime, nullable=False)
     user_id = Column(ForeignKey("usermodels.id"), nullable=False)
 
-    services = relationship("VolunteerServiceModel", secondary=ticket_to_volunteer_service, lazy="raise")
+    services = relationship("VolunteerServiceModel", secondary=ticket_to_volunteer_service, lazy="selectin")

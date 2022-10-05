@@ -16,7 +16,7 @@ services:
     command: uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
 
   postgres:
-    image: postgis/postgis:14-3.3-alpine
+    image: postgres:14-alpine
     container_name: postgres
     restart: always
     volumes:

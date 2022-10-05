@@ -1,19 +1,18 @@
-"""volunteer service, profile and ticket
+"""Add volunteer profile, service and ticket
 
-Revision ID: 1f6caca61631
+Revision ID: d3eb34ed6a4e
 Revises: 37e5086635ee
-Create Date: 2022-10-05 16:58:44.575720
+Create Date: 2022-10-05 20:32:14.884243
 
 """
 import sqlalchemy as sa
-from geoalchemy2 import Geography
 from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "1f6caca61631"
+revision = "d3eb34ed6a4e"
 down_revision = "37e5086635ee"
 branch_labels = None
 depends_on = None
@@ -26,9 +25,8 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column(
-            "location", Geography(geometry_type="POINT", from_text="ST_GeogFromText", name="geography"), nullable=False
-        ),
+        sa.Column("location_x", sa.Float(), nullable=False),
+        sa.Column("location_y", sa.Float(), nullable=False),
         sa.Column("area_size", sa.Integer(), nullable=False),
         sa.Column("city", sa.String(length=100), nullable=False),
         sa.Column("working_from", sa.Time(), nullable=False),
@@ -50,9 +48,8 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column(
-            "location", Geography(geometry_type="POINT", from_text="ST_GeogFromText", name="geography"), nullable=False
-        ),
+        sa.Column("location_x", sa.Float(), nullable=False),
+        sa.Column("location_y", sa.Float(), nullable=False),
         sa.Column("city", sa.String(length=100), nullable=False),
         sa.Column("description", sa.String(length=1000), nullable=False),
         sa.Column("valid_until", sa.DateTime(), nullable=False),
@@ -98,11 +95,9 @@ def downgrade() -> None:
     op.drop_table("ticket_to_volunteer_service")
     op.drop_table("volunteer_profile_to_service")
     op.drop_index(op.f("ix_ticketmodels_id"), table_name="ticketmodels")
-    op.drop_index("idx_ticketmodels_location", table_name="ticketmodels", postgresql_using="gist")
     op.drop_table("ticketmodels")
     op.drop_index(op.f("ix_volunteerservicemodels_id"), table_name="volunteerservicemodels")
     op.drop_table("volunteerservicemodels")
     op.drop_index(op.f("ix_volunteerprofilemodels_id"), table_name="volunteerprofilemodels")
-    op.drop_index("idx_volunteerprofilemodels_location", table_name="volunteerprofilemodels", postgresql_using="gist")
     op.drop_table("volunteerprofilemodels")
     # ### end Alembic commands ###
