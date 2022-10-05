@@ -37,7 +37,7 @@ async def get_user(user: UserSchema = Depends(get_request_user)) -> UserResponse
 
 
 @user_router.put("/me/", status_code=status.HTTP_200_OK, response_model=UserResponseSchema)
-async def modify_user(
+async def update_user(
     update_schema: UserUpdateSchema,
     user: UserSchema = Depends(get_request_user),
     user_service: UserService = Depends(),

@@ -5,6 +5,7 @@ from typing import (
 )
 
 import pytest
+from httpx import AsyncClient
 from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -12,6 +13,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.app import app
 from src.db import Base
 from src.settings import settings
 
@@ -26,7 +28,7 @@ def event_loop() -> Iterable[asyncio.AbstractEventLoop]:
 @pytest.fixture(scope="session")
 def test_database() -> None:
     with create_engine(
-        url=(f"postgresql://{settings.postgres_user}:{settings.postgres_password}" f"@{settings.postgres_host}")
+        url=f"postgresql://{settings.postgres_user}:{settings.postgres_password}@{settings.postgres_host}"
     ).connect() as connection:
         connection.execute("commit")
         connection.execute(f"create database {settings.postgres_database}_test")
@@ -63,3 +65,9 @@ async def async_test_session(async_test_engine: AsyncEngine, test_database) -> A
             yield async_session
 
         await transaction.rollback()
+
+
+@pytest.fixture(scope="session")
+async def http_client() -> AsyncClient:
+    async with AsyncClient(app=app, base_url="http://localhost:8000/") as async_client:
+        yield async_client

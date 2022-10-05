@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import Depends
 
 from src.data_access.user import UserDataAccess
+from src.schemas.user import data_access as data_access_schemas
 from src.schemas.user.data_access import UserInputSchema
 from src.schemas.user.dto import (
     UserRegisterSchema,
@@ -26,6 +27,7 @@ class UserService:
         return UserResponseSchema.from_orm(await self._user_data_access.get_by_id(id=user_id))
 
     async def update_user(self, update_schema: UserUpdateSchema, user_id: UUID) -> UserResponseSchema:
+        update_schema = data_access_schemas.UserUpdateSchema(**update_schema.dict())
         return UserResponseSchema.from_orm(
             await self._user_data_access.update_user(update_schema=update_schema, user_id=user_id)
         )
