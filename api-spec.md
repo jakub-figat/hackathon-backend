@@ -94,7 +94,7 @@ type Service {
     name: string;
 }
 
-type VolunteerProfile = {
+type VolunteerProfileModel = {
     userId: uuid;
     location: [number, number]; // coordinates
     areaSize: number; // radius
@@ -122,7 +122,7 @@ type TicketInput = {
     userId: uuid;
 }
 
-type Ticket = {
+type TicketModel = {
     id: uuid;
     location: [number, number];
     city: string;
@@ -162,19 +162,19 @@ PUT: UserUpdateInput /users/me/ -> User DONE
 POST: UserRegisterInput /users/register/ -> User DONE
 
 Volunteer profile
-POST: VolunteerProfileCreate /volunteers/ -> VolunteerProfile
-GET /volunteers/?VolunteerProfileParams -> PaginatedResponse<VolunteerProfile>
-GET /volunteers/<uuid>/ -> VolunteerProfile
-PUT: VolunteerProfileInput /volunteers/<uuid>/ -> VolunteerProfile
+POST: VolunteerProfileCreate /volunteers/ -> VolunteerProfileModel
+GET /volunteers/?VolunteerProfileParams -> PaginatedResponse<VolunteerProfileModel>
+GET /volunteers/<uuid>/ -> VolunteerProfileModel
+PUT: VolunteerProfileInput /volunteers/<uuid>/ -> VolunteerProfileModel
 
 Tokens
 POST: UserLoginInput /token/login/ -> AccessTokenResponse (sets refresh_token of type string cookie) DONE
 POST: Cookie: refresh_token /token/refresh/ -> AccessTokenResponse DONE
 
 Needy tickets
-GET /tickets/ -> PaginatedResponse<Ticket>
-POST: TicketInput /tickets/ -> Ticket
-PUT: TicketInput /tickets/<uuid>/ -> Ticket
+GET /tickets/ -> PaginatedResponse<TicketModel>
+POST: TicketInput /tickets/ -> TicketModel
+PUT: TicketInput /tickets/<uuid>/ -> TicketModel
 DELETE /tickets/<uuid>/ -> 204 No Content
 
 Request chat
