@@ -62,4 +62,4 @@ class VolunteerProfileSchema(BaseModel):
     working_from: dt.time
     working_to: dt.time
     city: str
-    services: list[VolunteerServiceSchema]
+    services: list[VolunteerServiceSchema] = []

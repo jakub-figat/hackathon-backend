@@ -12,7 +12,10 @@ from src.deps.jwt import (
     get_request_user,
     require_auth,
 )
-from src.exceptions.data_access import ObjectNotFound
+from src.exceptions.data_access import (
+    ObjectAlreadyExists,
+    ObjectNotFound,
+)
 from src.schemas.paging import (
     PaginatedResponseSchema,
     PagingInputParams,
@@ -73,7 +76,10 @@ async def create_volunteer_profile(
     volunteer_profile_service: VolunteerProfileService = Depends(),
     user: UserResponseSchema = Depends(get_request_user),
 ) -> VolunteerProfileSchema:
-    return await volunteer_profile_service.create_profile(schema=schema, user_id=user.id)
+    try:
+        return await volunteer_profile_service.create_profile(schema=schema, user_id=user.id)
+    except ObjectAlreadyExists:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Volunteer profile already exists")
 
 
 @volunteer_profile_router.put("/", response_model=VolunteerProfileSchema, status_code=status.HTTP_200_OK)

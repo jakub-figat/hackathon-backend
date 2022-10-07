@@ -20,3 +20,5 @@ app.add_middleware(
 app.include_router(router=user_router, prefix="/users")
 app.include_router(router=token_router, prefix="/token")
 app.include_router(router=volunteer_profile_router, prefix="/volunteers")
+
+# TODO: service lookup and linking to volunteer profiles

@@ -29,11 +29,11 @@ class VolunteerProfileService:
         return [VolunteerProfileSchema.from_orm(profile) for profile in profiles]
 
     async def create_profile(self, schema: VolunteerProfileInputSchema, user_id: UUID) -> VolunteerProfileSchema:
-        return VolunteerProfileSchema.from_orm(
-            await self._volunteer_profile_data_access.create(
-                input_schema=data_access.VolunteerProfileInputSchema(**schema.dict(), user_id=user_id)
-            )
+        profile = await self._volunteer_profile_data_access.create(
+            input_schema=data_access.VolunteerProfileInputSchema(**schema.dict(), user_id=user_id)
         )
+        location = profile.location_x, profile.location_y
+        return VolunteerProfileSchema(**profile.dict(exclude={"location_x", "location_y"}), location=location)
 
     async def update_profile(self, schema: VolunteerProfileInputSchema, user_id: UUID) -> VolunteerProfileSchema:
         profile_schema = await self._volunteer_profile_data_access.get_by_user_id(user_id=user_id)

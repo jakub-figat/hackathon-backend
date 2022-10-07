@@ -21,6 +21,7 @@ volunteer_profile_to_service = Table(
 
 
 class VolunteerProfileModel(Base):
+    user_id = Column(ForeignKey("usermodels.id"), unique=True, nullable=False)
     location_x = Column(Float, nullable=False)
     location_y = Column(Float, nullable=False)
     area_size = Column(Integer, nullable=False)
@@ -28,4 +29,4 @@ class VolunteerProfileModel(Base):
     working_from = Column(Time, nullable=False)
     working_to = Column(Time, nullable=False)
 
-    services = relationship("VolunteerServiceModel", secondary=volunteer_profile_to_service, lazy="selectin")
+    services = relationship("VolunteerServiceModel", secondary=volunteer_profile_to_service, lazy="raise")

@@ -7,6 +7,7 @@ from sqlalchemy import (
     select,
 )
 from sqlalchemy.dialects import postgresql as pg
+from sqlalchemy.orm import selectinload
 
 from src import VolunteerProfileModel
 from src.data_access.base import BaseAsyncPostgresDataAccess
@@ -27,7 +28,7 @@ class VolunteerProfileDataAccess(
     _output_schema = VolunteerProfileSchema
 
     async def get_by_user_id(self, user_id: UUID) -> VolunteerProfileSchema:
-        statement = select(self._model).where(self._model.user_id == user_id)
+        statement = select(self._model).options().where(self._model.user_id == user_id)
 
         if (model := (await self._session.scalar(statement))) is None:
             raise ObjectNotFound(f"The object with user_id={user_id} does not exist.")
@@ -96,3 +97,7 @@ class VolunteerProfileDataAccess(
         print(results)
 
         return []
+
+    @property
+    def _base_select(self):
+        return super()._base_select.options(selectinload(self._model.services))

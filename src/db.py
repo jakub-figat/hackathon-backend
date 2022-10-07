@@ -33,3 +33,5 @@ class Base:
     @declared_attr
     def __tablename__(cls):
         return f"{cls.__name__.lower()}s"
+
+    __mapper_args__ = {"eager_defaults": False}
