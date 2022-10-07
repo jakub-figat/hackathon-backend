@@ -4,6 +4,7 @@ from typing import (
 )
 
 from pydantic.fields import Field
+from pydantic.generics import GenericModel
 
 from src.schemas.base import BaseModel
 from src.settings import settings
@@ -19,7 +20,7 @@ class PagingInputParams(BaseModel):
         return settings.page_size + 1, (self.page_number - 1) * page_size
 
 
-class PaginatedResponseSchema(Generic[ResponseSchema], BaseModel):
+class PaginatedResponseSchema(GenericModel, Generic[ResponseSchema], BaseModel):
     count: int
     page_number: int
     has_next_page: bool
@@ -31,5 +32,5 @@ class PaginatedResponseSchema(Generic[ResponseSchema], BaseModel):
             count=len(results[:-1]),
             page_number=page_number,
             has_next_page=len(results) > settings.page_size,
-            results=results[:-1],
+            results=results[:-1] if len(results) > 1 else results,
         )

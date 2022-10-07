@@ -1,16 +1,15 @@
 import datetime as dt
-from typing import Any
-from uuid import (
-    UUID,
-    uuid4,
+from typing import (
+    Any,
+    Type,
 )
+from uuid import UUID
 
-from fastapi import Query
 from pydantic.class_validators import validator
-from pydantic.fields import Field
 
 from src.schemas.base import BaseModel
 from src.schemas.service.dto import VolunteerServiceSchema
+from src.schemas.volunteer_profile import data_access
 
 
 class VolunteerProfileInputSchema(BaseModel):
@@ -31,7 +30,6 @@ class VolunteerProfileInputSchema(BaseModel):
 
 
 class VolunteerProfileQueryParams(BaseModel):
-    area_size: float = 0
     working_from: dt.time | None = None
     working_to: dt.time | None = None
     city: str | None = None
@@ -47,11 +45,10 @@ class VolunteerProfileQueryParams(BaseModel):
 
 class VolunteerProfileFilterParams(BaseModel):
     location: tuple[float, float] | None = None
-    area_size: float = 0
     working_from: dt.time | None = None
     working_to: dt.time | None = None
     city: str | None = None
-    services_ids: list[UUID] = []
+    services_ids: list[UUID]
 
 
 class VolunteerProfileSchema(BaseModel):
@@ -63,3 +60,13 @@ class VolunteerProfileSchema(BaseModel):
     working_to: dt.time
     city: str
     services: list[VolunteerServiceSchema] = []
+
+    @classmethod
+    def from_orm(cls: Type["VolunteerProfileSchema"], obj: Any, **kwargs) -> "VolunteerProfileSchema":
+        profile = data_access.VolunteerProfileSchema.from_orm(obj)
+
+        return cls(
+            **profile.dict(exclude={"location_x", "location_y"}),
+            location=(profile.location_x, profile.location_y),
+            **kwargs,
+        )

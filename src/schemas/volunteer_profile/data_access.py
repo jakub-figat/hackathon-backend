@@ -1,8 +1,5 @@
 import datetime as dt
-from typing import (
-    Any,
-    Type,
-)
+from typing import Any
 from uuid import UUID
 
 from src.schemas.base import BaseModel
@@ -39,3 +36,4 @@ class VolunteerProfileSchema(BaseModel):
     working_from: dt.time
     working_to: dt.time
     city: str
+    services: list[VolunteerServiceSchema] = []

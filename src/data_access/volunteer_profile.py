@@ -1,9 +1,12 @@
 import datetime as dt
+from typing import Iterable
 from uuid import UUID
 
 from sqlalchemy import (
     and_,
+    delete,
     func,
+    insert,
     select,
 )
 from sqlalchemy.dialects import postgresql as pg
@@ -37,20 +40,21 @@ class VolunteerProfileDataAccess(
 
     def _apply_working_time_to_where_clause(self, statement, working_from: dt.time | None, working_to: dt.time | None):
         if working_from is not None:
-            statement = statement.where(self._model.working_from >= working_from)
+            statement = statement.where(self._model.working_from <= working_from)
 
         if working_to is not None:
-            statement = statement.where(self._model.working_to <= working_to)
+            statement = statement.where(self._model.working_to >= working_to)
 
         return statement
 
-    def _apply_location_to_where_clause(self, statement, location: tuple[float, float], area_size: float):
+    def _apply_location_to_where_clause(self, statement, location: tuple[float, float]):
         # check if database point (x2, y2) is inside circle (x, y) with radius area_size
         # sqrt((x2 - x)^2 + (y2 - y)^2) <= area_size
         x, y = location
 
         statement = statement.where(
-            func.sqrt(func.pow(self._model.location_x - x, 2) + func.pow(self._model.location_y - y, 2)) <= area_size
+            func.sqrt(func.pow(self._model.location_x - x, 2) + func.pow(self._model.location_y - y, 2))
+            <= self._model.area_size
         )
         return statement
 
@@ -59,44 +63,49 @@ class VolunteerProfileDataAccess(
     ) -> list[VolunteerProfileSchema]:
         params_dict = params.dict()
 
-        profile_service_ids = (
-            select(
-                volunteer_profile_to_service.c.volunteer_profile_id,
-                func.array_agg(volunteer_profile_to_service.c.volunteer_service_id, type_=pg.ARRAY(pg.UUID)).label(
-                    "service_ids"
-                ),
-            )
-            .group_by(volunteer_profile_to_service.c.volunteer_profile_id)
-            .subquery()
-        )
-
-        statement = select(self._model, profile_service_ids.c.service_ids).join(
-            profile_service_ids,
-            VolunteerProfileModel.id == profile_service_ids.c.volunteer_profile_id,
-            isouter=True,
-        )
-
+        statement = self._base_select
         statement = self._apply_working_time_to_where_clause(
             statement=statement, working_from=params_dict.pop("working_from"), working_to=params_dict.pop("working_to")
         )
+
         if (location := params_dict.pop("location")) is not None:
-            statement = self._apply_location_to_where_clause(
-                statement=statement, location=location, area_size=params_dict.pop("area_size")
+            statement = self._apply_location_to_where_clause(statement=statement, location=location)
+
+        if len(services_ids := params_dict.pop("services_ids")):
+            profile_service_ids = (
+                select(
+                    volunteer_profile_to_service.c.volunteer_profile_id,
+                    func.array_agg(volunteer_profile_to_service.c.volunteer_service_id, type_=pg.ARRAY(pg.UUID)).label(
+                        "service_ids"
+                    ),
+                )
+                .group_by(volunteer_profile_to_service.c.volunteer_profile_id)
+                .subquery()
             )
 
-        services_ids = params_dict.pop("services_ids")
+            statement = statement.join(
+                profile_service_ids,
+                VolunteerProfileModel.id == profile_service_ids.c.volunteer_profile_id,
+                isouter=True,
+            ).where(profile_service_ids.c.service_ids.contains([str(id_) for id_ in services_ids]))
 
         statement = (
-            statement.where(profile_service_ids.c.service_ids.contains([str(id_) for id_ in services_ids]))
-            .where(and_(*(getattr(self._model, key) == value for key, value in params_dict.items())))
+            statement.where(
+                and_(*(getattr(self._model, key) == value for key, value in params_dict.items() if value is not None))
+            )
             .limit(limit)
             .offset(offset)
         )
 
-        results = (await self._session.execute(statement)).all()
-        print(results)
+        return [VolunteerProfileSchema.from_orm(profile) for profile in await self._session.scalars(statement)]
 
-        return []
+    async def set_volunteer_services(self, profile_id: UUID, services_ids: Iterable[UUID]) -> None:
+        await self.get_by_id(id=profile_id)
+        await self._session.execute(delete(volunteer_profile_to_service))
+
+        profiles_to_services = [(str(profile_id), str(service_id)) for service_id in services_ids]
+        await self._session.execute(insert(volunteer_profile_to_service).values(*profiles_to_services))
+        await self._session.commit()
 
     @property
     def _base_select(self):

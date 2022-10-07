@@ -37,6 +37,7 @@ volunteer_profile_router = APIRouter(tags=["volunteer_profiles"])
     "/",
     response_model=PaginatedResponseSchema[VolunteerProfileSchema],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(require_auth)],
 )
 async def get_volunteer_profiles(
     location: tuple[float, float] | None = Query(None),
@@ -51,7 +52,9 @@ async def get_volunteer_profiles(
     profiles = await volunteer_profile_service.get_profiles(
         *paging_params.to_limit_offset(), filter_params=profile_filter_params
     )
-    return PaginatedResponseSchema.from_results(results=profiles, page_number=paging_params.page_number)
+    return PaginatedResponseSchema[VolunteerProfileSchema].from_results(
+        results=profiles, page_number=paging_params.page_number
+    )
 
 
 @volunteer_profile_router.get(
@@ -80,15 +83,17 @@ async def create_volunteer_profile(
         return await volunteer_profile_service.create_profile(schema=schema, user_id=user.id)
     except ObjectAlreadyExists:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Volunteer profile already exists")
+    except ObjectNotFound as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
 
 
 @volunteer_profile_router.put("/", response_model=VolunteerProfileSchema, status_code=status.HTTP_200_OK)
-async def create_volunteer_profile(
+async def update_volunteer_profile(
     schema: VolunteerProfileInputSchema,
     volunteer_profile_service: VolunteerProfileService = Depends(),
     user: UserResponseSchema = Depends(get_request_user),
 ) -> VolunteerProfileSchema:
     try:
         return await volunteer_profile_service.update_profile(schema=schema, user_id=user.id)
-    except ObjectNotFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    except ObjectNotFound as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
