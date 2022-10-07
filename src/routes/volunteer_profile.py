@@ -4,6 +4,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Query,
     status,
 )
 
@@ -12,9 +13,15 @@ from src.deps.jwt import (
     require_auth,
 )
 from src.exceptions.data_access import ObjectNotFound
+from src.schemas.paging import (
+    PaginatedResponseSchema,
+    PagingInputParams,
+)
 from src.schemas.user.dto import UserResponseSchema
 from src.schemas.volunteer_profile.dto import (
+    VolunteerProfileFilterParams,
     VolunteerProfileInputSchema,
+    VolunteerProfileQueryParams,
     VolunteerProfileSchema,
 )
 from src.services.volunteer_profile import VolunteerProfileService
@@ -24,19 +31,28 @@ volunteer_profile_router = APIRouter(tags=["volunteer_profiles"])
 
 
 @volunteer_profile_router.get(
-    "/volunteers/",
-    response_model=list[VolunteerProfileSchema],
+    "/",
+    response_model=PaginatedResponseSchema[VolunteerProfileSchema],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_auth)],
 )
 async def get_volunteer_profiles(
+    location: tuple[float, float] | None = Query(None),
+    services_ids: list[UUID] = Query([]),
+    profile_query_params: VolunteerProfileQueryParams = Depends(),
+    paging_params: PagingInputParams = Depends(),
     volunteer_profile_service: VolunteerProfileService = Depends(),
-) -> list[VolunteerProfileSchema]:
-    return await volunteer_profile_service.get_profiles(limit=50, offset=50)  # TODO add paging
+) -> PaginatedResponseSchema[VolunteerProfileSchema]:
+    profile_filter_params = VolunteerProfileFilterParams(
+        **profile_query_params.dict(), location=location, services_ids=services_ids
+    )
+    profiles = await volunteer_profile_service.get_profiles(
+        *paging_params.to_limit_offset(), filter_params=profile_filter_params
+    )
+    return PaginatedResponseSchema.from_results(results=profiles, page_number=paging_params.page_number)
 
 
 @volunteer_profile_router.get(
-    "/volunteers/{profile_id}",
+    "/{profile_id}",
     response_model=VolunteerProfileSchema,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(require_auth)],
@@ -51,9 +67,7 @@ async def get_volunteer_profile(
         raise HTTPException(detail="Not found", status_code=status.HTTP_404_NOT_FOUND)
 
 
-@volunteer_profile_router.post(
-    "/volunteers/", response_model=VolunteerProfileSchema, status_code=status.HTTP_201_CREATED
-)
+@volunteer_profile_router.post("/", response_model=VolunteerProfileSchema, status_code=status.HTTP_201_CREATED)
 async def create_volunteer_profile(
     schema: VolunteerProfileInputSchema,
     volunteer_profile_service: VolunteerProfileService = Depends(),
@@ -62,7 +76,7 @@ async def create_volunteer_profile(
     return await volunteer_profile_service.create_profile(schema=schema, user_id=user.id)
 
 
-@volunteer_profile_router.put("/volunteers/", response_model=VolunteerProfileSchema, status_code=status.HTTP_200_OK)
+@volunteer_profile_router.put("/", response_model=VolunteerProfileSchema, status_code=status.HTTP_200_OK)
 async def create_volunteer_profile(
     schema: VolunteerProfileInputSchema,
     volunteer_profile_service: VolunteerProfileService = Depends(),

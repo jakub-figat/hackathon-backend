@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.routes.token import token_router
 from src.routes.user import user_router
+from src.routes.volunteer_profile import volunteer_profile_router
 from src.settings import settings
 
 
@@ -18,9 +19,4 @@ app.add_middleware(
 
 app.include_router(router=user_router, prefix="/users")
 app.include_router(router=token_router, prefix="/token")
-
-
-# TODO: rozjeb schemy, dzieeki
-# TODO: popraw kurwa pasy
-# TODO: testy tokeny
-# TODO: rotacja kurwami
+app.include_router(router=volunteer_profile_router, prefix="/volunteers")
