@@ -6,6 +6,7 @@ from typing import (
 from uuid import UUID
 
 from pydantic.class_validators import validator
+import pydantic
 
 from src.schemas.base import BaseModel
 from src.schemas.service.dto import VolunteerServiceSchema
@@ -29,7 +30,7 @@ class VolunteerProfileInputSchema(BaseModel):
         return working_to
 
 
-class VolunteerProfileQueryParams(BaseModel):
+class VolunteerProfileQueryParams(pydantic.BaseModel):
     working_from: dt.time | None = None
     working_to: dt.time | None = None
     city: str | None = None

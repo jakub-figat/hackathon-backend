@@ -3,6 +3,7 @@ from typing import (
     TypeVar,
 )
 
+import pydantic
 from pydantic.fields import Field
 from pydantic.generics import GenericModel
 
@@ -13,7 +14,7 @@ from src.settings import settings
 ResponseSchema = TypeVar("ResponseSchema", bound=BaseModel)
 
 
-class PagingInputParams(BaseModel):
+class PagingInputParams(pydantic.BaseModel):
     page_number: int = Field(default=1, gt=0)
 
     def to_limit_offset(self, page_size: int = settings.page_size) -> tuple[int, int]:
