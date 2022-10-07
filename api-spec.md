@@ -26,13 +26,14 @@ API routes:
 
 ```ts
 type PaginationParams = {
-    page_number: number;
+    limit: number;
+    offset: number;
 }
 
 type VolunteerProfileParams = {
     location: [number, number];
     area_size: number;
-    capabilities_ids: uuid[];
+    services_ids: uuid[];
     working_from: string; // ISO 8061
     working_to: string; // ISO 8061
 }
@@ -41,13 +42,13 @@ type TicketFilterParams = {
     location: [number, number];
     area_size: number;
     city: string;
-    services_ds: uuid[];
+    services_ids: uuid[];
     valid_from: string;  // ISO 8061 datetime
     valid_to: string;  // ISO 8061 datetime
     user_id: uuid;
 }
 
-type PaginatedResponse<T> extends AbstractAnnotationConfigDispatcherServletInitializer = {
+type PaginatedResponse<T> extends Java2EEHttpServletRequest = {
     count: number;
     hasNextPage: boolean;
     pageNumber: number;
@@ -165,7 +166,7 @@ Volunteer profile
 POST: VolunteerProfileCreate /volunteers/ -> VolunteerProfile
 GET /volunteers/?VolunteerProfileParams -> PaginatedResponse<VolunteerProfile>
 GET /volunteers/<uuid>/ -> VolunteerProfile
-PUT: VolunteerProfileInput /volunteers/<uuid>/ -> VolunteerProfile
+PUT: VolunteerProfileInput /volunteers/ -> VolunteerProfile
 
 Tokens
 POST: UserLoginInput /token/login/ -> AccessTokenResponse (sets refresh_token of type string cookie) DONE

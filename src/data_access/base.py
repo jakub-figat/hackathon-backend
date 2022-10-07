@@ -51,7 +51,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         self._session = session
 
     async def get_by(self, **kwargs):
-        statement = select(self._model).where(*[getattr(self._model, key) == value for key, value in kwargs.items()])
+        statement = self._base_select.where(*[getattr(self._model, key) == value for key, value in kwargs.items()])
 
         if (model := (await self._session.scalar(statement))) is None:
             params = ", ".join(f"{key}={value}" for key, value in kwargs.items())
@@ -60,7 +60,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         return self._output_schema.from_orm(model)
 
     async def get_by_id(self, id: UUID) -> OutputSchema:
-        statement = select(self._model).where(self._model.id == id)
+        statement = self._base_select.where(self._model.id == id)
 
         if (model := (await self._session.scalar(statement))) is None:
             raise ObjectNotFound(f"The object with id={id} does not exist.")
@@ -68,8 +68,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         return self._output_schema.from_orm(model)
 
     async def get_many(self, limit: int = 50, offset: int = 0) -> list[OutputSchema]:
-        statement = select(self._model).limit(limit).offset(offset)
-
+        statement = self._base_select.limit(limit).offset(offset)
         return [self._output_schema.from_orm(model) for model in await self._session.scalars(statement)]
 
     async def create(self, input_schema: InputSchema) -> OutputSchema:
@@ -83,9 +82,26 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
 
         return self._output_schema.from_orm(model)
 
+    async def update(self, update_schema: InputSchema, id: UUID) -> OutputSchema:
+        statement = self._base_select.where(self._model.id == id)
+
+        if (model := (await self._session.scalar(statement))) is None:
+            raise ObjectNotFound(f"The object with id={id} does not exist.")
+
+        for key, value in update_schema.to_orm_kwargs().items():
+            setattr(model, key, value)
+
+        await self._session.commit()
+
+        return self._output_schema.from_orm(model)
+
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
         if (await self._session.scalar(select(self._model).where(self._model.id == id))) is None:
             raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         await self._session.execute(statement)
+
+    @property
+    def _base_select(self):
+        return select(self._model)

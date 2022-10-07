@@ -114,7 +114,7 @@ async def test_user_data_access_raises_model_already_exists_when_email_is_alread
 async def test_user_data_access_update_user(user_data_access_with_user: UserDataAccess) -> None:
     update_schema = UserUpdateSchema(first_name="stachu", last_name="stachecki", date_of_birth=dt.date(2015, 1, 1))
     user_from_db = (await user_data_access_with_user.get_many())[0]
-    user_schema = await user_data_access_with_user.update_user(update_schema=update_schema, user_id=user_from_db.id)
+    user_schema = await user_data_access_with_user.update(update_schema=update_schema, id=user_from_db.id)
 
     assert user_schema.first_name == update_schema.first_name
     assert user_schema.last_name == update_schema.last_name
@@ -124,4 +124,4 @@ async def test_user_data_access_update_user(user_data_access_with_user: UserData
 async def test_user_data_access_update_user_raises_object_not_found(user_data_access: UserDataAccess) -> None:
     update_schema = UserUpdateSchema(first_name="stachu", last_name="stachecki", date_of_birth=dt.date(2015, 1, 1))
     with pytest.raises(ObjectNotFound):
-        await user_data_access.update_user(update_schema=update_schema, user_id=uuid.uuid4())
+        await user_data_access.update(update_schema=update_schema, id=uuid.uuid4())
