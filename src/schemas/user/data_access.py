@@ -17,15 +17,10 @@ class UserInputSchema(BaseInputSchema):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    is_verified: bool
 
     def to_orm_kwargs(self) -> dict[str, Any]:
-        return {
-            "email": self.email,
-            "password": self.password,
-            "date_of_birth": self.date_of_birth,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-        }
+        return self.dict()
 
 
 class UserUpdateSchema(BaseInputSchema):
@@ -33,6 +28,9 @@ class UserUpdateSchema(BaseInputSchema):
     first_name: str
     last_name: str
     phone_number: Optional[str]
+    otp_code: Optional[int]
+    otp_code_issued_at: Optional[dt.datetime]
+    is_verified: bool
 
     def to_orm_kwargs(self) -> dict[str, Any]:
         return self.dict()
@@ -45,4 +43,7 @@ class UserSchema(BaseModel):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    is_verified: bool
     phone_number: Optional[str]
+    otp_code: Optional[int]
+    otp_code_issued_at: Optional[dt.datetime]

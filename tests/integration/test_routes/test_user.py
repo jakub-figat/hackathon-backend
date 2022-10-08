@@ -29,6 +29,7 @@ def register_schema() -> UserInputSchema:
         password="password12345678",
         first_name="Jacek",
         last_name="Gardziel",
+        is_verified=False,
     )
 
 
@@ -41,15 +42,14 @@ def user_schema() -> UserSchema:
         password="password12345678",
         first_name="Jacek",
         last_name="Gardziel",
+        is_verified=False,
     )
 
 
 @pytest.fixture
 def update_user_schema() -> UserUpdateSchema:
     return UserUpdateSchema(
-        date_of_birth=dt.date(2020, 5, 5),
-        first_name="Jacek",
-        last_name="Smierdziel",
+        date_of_birth=dt.date(2020, 5, 5), first_name="Jacek", last_name="Smierdziel", is_verified=False
     )
 
 
