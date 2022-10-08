@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.routes.ticket import ticket_router
 from src.routes.token import token_router
 from src.routes.user import user_router
 from src.routes.volunteer_profile import volunteer_profile_router
@@ -20,3 +21,8 @@ app.add_middleware(
 app.include_router(router=user_router, prefix="/users")
 app.include_router(router=token_router, prefix="/token")
 app.include_router(router=volunteer_profile_router, prefix="/volunteers")
+app.include_router(router=ticket_router, prefix="/tickets")
+
+
+# TODO: heading to ticket
+# TODO: permissions with tickets

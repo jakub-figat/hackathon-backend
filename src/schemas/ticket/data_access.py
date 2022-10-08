@@ -27,9 +27,10 @@ class TicketInputSchema(BaseInputSchema):
 
 class TicketSchema(BaseModel):
     id: UUID
-    location: tuple[float, float]
+    location_x: float
+    location_y: float
     city: str
     description: str
     valid_until: dt.datetime
     user_id: UUID
-    services: list[VolunteerServiceSchema]
+    services: list[VolunteerServiceSchema] = []

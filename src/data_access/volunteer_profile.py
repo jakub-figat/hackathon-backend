@@ -31,7 +31,9 @@ class VolunteerProfileDataAccess(
     _output_schema = VolunteerProfileSchema
 
     async def get_by_user_id(self, user_id: UUID) -> VolunteerProfileSchema:
-        statement = select(self._model).options().where(self._model.user_id == user_id)
+        statement = (
+            select(self._model).options(selectinload(self._model.services)).where(self._model.user_id == user_id)
+        )
 
         if (model := (await self._session.scalar(statement))) is None:
             raise ObjectNotFound(f"The object with user_id={user_id} does not exist.")
@@ -71,6 +73,7 @@ class VolunteerProfileDataAccess(
         if (location := params_dict.pop("location")) is not None:
             statement = self._apply_location_to_where_clause(statement=statement, location=location)
 
+        print(params_dict["services_ids"], "@@@@@@@@")
         if len(services_ids := params_dict.pop("services_ids")):
             profile_service_ids = (
                 select(
@@ -103,8 +106,9 @@ class VolunteerProfileDataAccess(
         await self.get_by_id(id=profile_id)
         await self._session.execute(delete(volunteer_profile_to_service))
 
-        profiles_to_services = [(str(profile_id), str(service_id)) for service_id in services_ids]
-        await self._session.execute(insert(volunteer_profile_to_service).values(*profiles_to_services))
+        if services_ids:
+            profiles_to_services = [(str(profile_id), str(service_id)) for service_id in services_ids]
+            await self._session.execute(insert(volunteer_profile_to_service).values(*profiles_to_services))
         await self._session.commit()
 
     @property

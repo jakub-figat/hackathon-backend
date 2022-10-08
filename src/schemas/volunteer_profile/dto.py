@@ -5,8 +5,8 @@ from typing import (
 )
 from uuid import UUID
 
-from pydantic.class_validators import validator
 import pydantic
+from pydantic.class_validators import validator
 
 from src.schemas.base import BaseModel
 from src.schemas.service.dto import VolunteerServiceSchema

@@ -80,7 +80,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
         except IntegrityError:
             raise ObjectAlreadyExists(f"Unique constraint violation for model {self._model.__name__}")
 
-        return self._output_schema.from_orm(model)
+        return await self.get_by_id(id=model.id)
 
     async def update(self, update_schema: InputSchema, id: UUID) -> OutputSchema:
         statement = self._base_select.where(self._model.id == id)
@@ -93,7 +93,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
 
         await self._session.commit()
 
-        return self._output_schema.from_orm(model)
+        return await self.get_by_id(id=id)
 
     async def delete_by_id(self, id: UUID) -> None:
         statement = delete(self._model).where(self._model.id == id)
@@ -101,6 +101,7 @@ class BaseAsyncPostgresDataAccess(Generic[Model, InputSchema, OutputSchema], ABC
             raise ObjectNotFound(f"The object with id={id} does not exist.")
 
         await self._session.execute(statement)
+        await self._session.commit()
 
     @property
     def _base_select(self):
