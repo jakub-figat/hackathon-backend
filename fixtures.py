@@ -1,11 +1,14 @@
-import datetime as dt
 import asyncio
+import datetime as dt
 
 from sqlalchemy import insert
 
 from src.db import Session
 from src.models.services import VolunteerServiceModel
-from src.models.ticket import TicketModel, ticket_to_volunteer_service
+from src.models.ticket import (
+    TicketModel,
+    ticket_to_volunteer_service,
+)
 from src.models.user import UserModel
 from src.models.volunteer_profile import VolunteerProfileModel
 
@@ -25,10 +28,7 @@ async def main() -> None:
             ]
         )
         session.add_all(
-            [
-                VolunteerServiceModel(name=name)
-                for name in ["Pranie", "Sprzatanie", "Gotowanie", "Noszenie gruzu"]
-            ]
+            [VolunteerServiceModel(name=name) for name in ["Pranie", "Sprzatanie", "Gotowanie", "Noszenie gruzu"]]
         )
         monster_delivery_service = VolunteerServiceModel(name="Monster delivery")
         session.add(monster_delivery_service)
@@ -50,7 +50,7 @@ async def main() -> None:
                     city="Warsaw",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+                    user_id=ticket_owner.id,
                 ),
                 TicketModel(
                     location_x=52.225123,
@@ -58,7 +58,7 @@ async def main() -> None:
                     city="Warsaw",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+                    user_id=ticket_owner.id,
                 ),
                 TicketModel(
                     location_x=50.061426,
@@ -66,7 +66,7 @@ async def main() -> None:
                     city="Krakow",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+                    user_id=ticket_owner.id,
                 ),
                 TicketModel(
                     location_x=50.061426,
@@ -74,7 +74,7 @@ async def main() -> None:
                     city="Krakow",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+                    user_id=ticket_owner.id,
                 ),
                 TicketModel(
                     location_x=50.293930,
@@ -82,18 +82,18 @@ async def main() -> None:
                     city="Gliwice",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+                    user_id=ticket_owner.id,
                 ),
             ]
         )
         await session.commit()
         ticket_with_services = TicketModel(
-                    location_x=50.540650,
-                    location_y=22.721789,
-                    city="Bilgoraj",
-                    description="Bla bla bla",
-                    valid_until=dt.datetime(2023, 1, 1),
-                    user_id=ticket_owner.id
+            location_x=50.540650,
+            location_y=22.721789,
+            city="Bilgoraj",
+            description="Bla bla bla",
+            valid_until=dt.datetime(2023, 1, 1),
+            user_id=ticket_owner.id,
         )
         session.add(ticket_with_services)
         await session.commit()
@@ -121,11 +121,11 @@ async def main() -> None:
                 area_size=20,
                 city="Jastrzebie-Zdroj",
                 working_from=dt.time(12, 0),
-                working_to=dt.time(20, 0)
+                working_to=dt.time(20, 0),
             )
         )
         await session.commit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

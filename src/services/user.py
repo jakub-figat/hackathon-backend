@@ -3,11 +3,14 @@ from datetime import (
     datetime,
     timedelta,
 )
-from uuid import UUID
+from uuid import (
+    UUID,
+    uuid4,
+)
 
 from fastapi import (
     Depends,
-    HTTPException,
+    UploadFile,
 )
 
 from src.data_access.user import UserDataAccess
@@ -22,6 +25,12 @@ from src.schemas.user.dto import (
     UserResponseSchema,
 )
 from src.settings import settings
+from src.utils.images import (
+    remove_file_from_s3,
+    remove_file_locally,
+    save_image_locally,
+    upload_image_to_s3,
+)
 from src.utils.password import password_context
 from src.utils.sns import send_otp
 
@@ -91,3 +100,15 @@ class UserService:
             ),
             id=user.id,
         )
+
+    async def save_user_image(self, image_file: UploadFile, user_id: UUID) -> None:
+        user = await self._user_data_access.get_by_id(id=user_id)
+        if user.image is not None:
+            await (remove_file_locally(user.image) if settings.debug else remove_file_from_s3(user.image))
+
+        image_path = await (
+            save_image_locally(image_uuid=uuid4(), image_file=image_file)
+            if settings.debug
+            else upload_image_to_s3(image_uuid=uuid4(), image_file=image_file)
+        )
+        await self._user_data_access.update_user_image(image_path=image_path, user_id=user_id)

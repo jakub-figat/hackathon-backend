@@ -43,6 +43,7 @@ class UserSchema(BaseModel):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    image: str | None = None
     is_verified: bool
     phone_number: Optional[str]
     otp_code: Optional[int]

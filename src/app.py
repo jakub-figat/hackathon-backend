@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.routes.chat import chat_router
 from src.routes.services import service_router
@@ -11,6 +12,9 @@ from src.settings import settings
 
 
 app = FastAPI()
+
+if settings.debug:
+    app.mount("/static", StaticFiles(directory="/var/www/media/"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

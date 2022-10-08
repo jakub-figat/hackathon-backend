@@ -8,9 +8,7 @@ from fastapi import (
     status,
 )
 
-from src.deps.jwt import (
-    get_request_user,
-)
+from src.deps.jwt import get_request_user
 from src.exceptions.data_access import (
     ObjectAlreadyExists,
     ObjectNotFound,

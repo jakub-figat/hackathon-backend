@@ -3,10 +3,10 @@ import re
 from typing import Optional
 from uuid import UUID
 
-from pydantic import conint
 from pydantic.class_validators import validator
 from pydantic.fields import Field
 from pydantic.networks import EmailStr
+from pydantic.types import conint
 
 from src.schemas.base import BaseModel
 
@@ -65,6 +65,7 @@ class UserResponseSchema(BaseModel):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    image: str | None = None
     phone_number: Optional[str]
     is_verified: bool
 
