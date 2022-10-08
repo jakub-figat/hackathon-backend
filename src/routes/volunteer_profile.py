@@ -10,7 +10,6 @@ from fastapi import (
 
 from src.deps.jwt import (
     get_request_user,
-    require_auth,
 )
 from src.exceptions.data_access import (
     ObjectAlreadyExists,
