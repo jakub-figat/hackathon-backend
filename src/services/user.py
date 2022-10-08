@@ -1,6 +1,12 @@
-from uuid import UUID
+from uuid import (
+    UUID,
+    uuid4,
+)
 
-from fastapi import Depends
+from fastapi import (
+    Depends,
+    UploadFile,
+)
 
 from src.data_access.user import UserDataAccess
 from src.schemas.user import data_access as data_access_schemas
@@ -9,6 +15,13 @@ from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
     UserUpdateSchema,
+)
+from src.settings import settings
+from src.utils.images import (
+    remove_file_from_s3,
+    remove_file_locally,
+    save_image_locally,
+    upload_image_to_s3,
 )
 from src.utils.password import password_context
 
@@ -31,3 +44,15 @@ class UserService:
         return UserResponseSchema.from_orm(
             await self._user_data_access.update(update_schema=update_schema, id=user_id)
         )
+
+    async def save_user_image(self, image_file: UploadFile, user_id: UUID) -> None:
+        user = await self._user_data_access.get_by_id(id=user_id)
+        if user.image is not None:
+            await (remove_file_locally(user.image) if settings.debug else remove_file_from_s3(user.image))
+
+        image_path = await (
+            save_image_locally(image_uuid=uuid4(), image_file=image_file)
+            if settings.debug
+            else upload_image_to_s3(image_uuid=uuid4(), image_file=image_file)
+        )
+        await self._user_data_access.update_user_image(image_path=image_path, user_id=user_id)

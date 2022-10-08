@@ -6,6 +6,7 @@ services:
     container_name: backend
     volumes:
       - .:/app/
+      - media:/var/www/media
     env_file:
       - .env
     ports:
@@ -26,3 +27,4 @@ services:
 
 volumes:
   pgdata:
+  media:

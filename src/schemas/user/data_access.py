@@ -44,3 +44,4 @@ class UserSchema(BaseModel):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    image: str | None = None

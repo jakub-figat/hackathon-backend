@@ -2,6 +2,8 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Response,
+    UploadFile,
     status,
 )
 
@@ -43,3 +45,11 @@ async def update_user(
     user_service: UserService = Depends(),
 ) -> UserResponseSchema:
     return await user_service.update_user(update_schema=update_schema, user_id=user.id)
+
+
+@user_router.put("/me/image/", status_code=status.HTTP_200_OK)
+async def update_user_image(
+    image_file: UploadFile, user_service: UserService = Depends(), user: UserSchema = Depends(get_request_user)
+) -> Response:
+    await user_service.save_user_image(image_file=image_file, user_id=user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
