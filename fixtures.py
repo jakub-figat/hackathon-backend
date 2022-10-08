@@ -113,12 +113,11 @@ async def main() -> None:
         )
         session.add(profile_owner)
         await session.commit()
-
         session.add(
             VolunteerProfileModel(
                 user_id=profile_owner.id,
-                location_x=10,
-                location_y=10,
+                location_x=50.017243,
+                location_y=18.623232,
                 area_size=20,
                 city="Jastrzebie-Zdroj",
                 working_from=dt.time(12, 0),
