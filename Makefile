@@ -19,12 +19,14 @@ alembic-revision:
 alembic-upgrade:
 	docker-compose run --rm backend bash -c "alembic upgrade head"
 
+load-fixtures:
+	docker-compose run --rm backend bash -c "python3 fixtures.py"
+
 test:
 	docker-compose run --rm backend bash -c "pytest"
 
 integration-test:
 	docker-compose run --rm backend bash -c "pytest --integration"
-
 
 cov-html:
 	docker-compose run --rm --entrypoint "" backend bash -c "coverage html"

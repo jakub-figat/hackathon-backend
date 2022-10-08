@@ -49,9 +49,7 @@ async def get_tickets(
     return PaginatedResponseSchema[TicketSchema].from_results(results=tickets, page_number=paging_params.page_number)
 
 
-@ticket_router.get(
-    "/{ticket_id}/", status_code=status.HTTP_200_OK, response_model=TicketSchema
-)
+@ticket_router.get("/{ticket_id}/", status_code=status.HTTP_200_OK, response_model=TicketSchema)
 async def get_ticket(ticket_id: UUID, ticket_service: TicketService = Depends()) -> TicketSchema:
     try:
         return await ticket_service.get_ticket(ticket_id=ticket_id)
