@@ -32,3 +32,8 @@ app.include_router(router=ticket_router, prefix="/tickets")
 app.include_router(router=service_router, prefix="/services")
 app.include_router(router=chat_router, prefix="/chats")
 app.include_router(router=city_router, prefix="/cities")
+
+
+@app.get("/health", status_code=200)
+async def health_check():
+    return {"msg": "I'm alive!"}
