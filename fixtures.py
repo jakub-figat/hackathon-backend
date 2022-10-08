@@ -40,47 +40,45 @@ async def main() -> None:
             first_name="Stach",
             last_name="Stach",
         )
-
         session.add(ticket_owner)
         await session.commit()
-
         session.add_all(
             [
                 TicketModel(
-                    location_x=1,
-                    location_y=1,
+                    location_x=52.225123,
+                    location_y=21.031186,
                     city="Warsaw",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
                     user_id=ticket_owner.id
                 ),
                 TicketModel(
-                    location_x=2,
-                    location_y=2,
+                    location_x=52.225123,
+                    location_y=21.031186,
                     city="Warsaw",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
                     user_id=ticket_owner.id
                 ),
                 TicketModel(
-                    location_x=3,
-                    location_y=3,
+                    location_x=50.061426,
+                    location_y=19.932629,
                     city="Krakow",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
                     user_id=ticket_owner.id
                 ),
                 TicketModel(
-                    location_x=4,
-                    location_y=4,
+                    location_x=50.061426,
+                    location_y=19.932629,
                     city="Krakow",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
                     user_id=ticket_owner.id
                 ),
                 TicketModel(
-                    location_x=5,
-                    location_y=5,
+                    location_x=50.293930,
+                    location_y=18.665396,
                     city="Gliwice",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
@@ -89,10 +87,9 @@ async def main() -> None:
             ]
         )
         await session.commit()
-
         ticket_with_services = TicketModel(
-                    location_x=6,
-                    location_y=6,
+                    location_x=50.540650,
+                    location_y=22.721789,
                     city="Bilgoraj",
                     description="Bla bla bla",
                     valid_until=dt.datetime(2023, 1, 1),
