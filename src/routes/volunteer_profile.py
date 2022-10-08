@@ -57,7 +57,7 @@ async def get_volunteer_profiles(
 
 
 @volunteer_profile_router.get(
-    "/{profile_id}",
+    "/{profile_id}/",
     response_model=VolunteerProfileSchema,
     status_code=status.HTTP_200_OK,
 )
