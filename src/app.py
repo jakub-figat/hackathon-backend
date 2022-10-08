@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.routes.chat import chat_router
+from src.routes.city import city_router
 from src.routes.services import service_router
 from src.routes.ticket import ticket_router
 from src.routes.token import token_router
@@ -30,3 +31,4 @@ app.include_router(router=volunteer_profile_router, prefix="/volunteers")
 app.include_router(router=ticket_router, prefix="/tickets")
 app.include_router(router=service_router, prefix="/services")
 app.include_router(router=chat_router, prefix="/chats")
+app.include_router(router=city_router, prefix="/cities")

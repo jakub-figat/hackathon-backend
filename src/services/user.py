@@ -10,6 +10,7 @@ from uuid import (
 
 from fastapi import (
     Depends,
+    HTTPException,
     UploadFile,
 )
 

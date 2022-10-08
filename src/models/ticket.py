@@ -20,6 +20,7 @@ ticket_to_volunteer_service = Table(
 
 
 class TicketModel(Base):
+    title = Column(String(100), nullable=False)
     location_x = Column(Float, nullable=False)
     location_y = Column(Float, nullable=False)
     city = Column(String(100), nullable=False)

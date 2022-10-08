@@ -14,6 +14,7 @@ from src.schemas.ticket import data_access
 
 
 class TicketInputSchema(BaseModel):
+    title: str
     location: tuple[float, float]
     city: str
     description: str
@@ -49,6 +50,7 @@ class TicketFilterParams(BaseModel):
 
 class TicketSchema(BaseModel):
     id: UUID
+    title: str
     user_id: UUID
     location: tuple[float, float]
     city: str

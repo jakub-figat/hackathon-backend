@@ -8,6 +8,7 @@ from src.utils.schemas import BaseInputSchema
 
 
 class TicketInputSchema(BaseInputSchema):
+    title: str
     location: tuple[float, float]
     city: str
     description: str
@@ -16,6 +17,7 @@ class TicketInputSchema(BaseInputSchema):
 
     def to_orm_kwargs(self) -> dict[str, Any]:
         return {
+            "title": self.title,
             "location_x": self.location[0],
             "location_y": self.location[1],
             "city": self.city,
@@ -27,6 +29,7 @@ class TicketInputSchema(BaseInputSchema):
 
 class TicketSchema(BaseModel):
     id: UUID
+    title: str
     location_x: float
     location_y: float
     city: str

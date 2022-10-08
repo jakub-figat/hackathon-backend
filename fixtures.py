@@ -45,6 +45,7 @@ async def main() -> None:
         session.add_all(
             [
                 TicketModel(
+                    title="Some ticket",
                     location_x=52.225123,
                     location_y=21.031186,
                     city="Warsaw",
@@ -53,6 +54,7 @@ async def main() -> None:
                     user_id=ticket_owner.id,
                 ),
                 TicketModel(
+                    title="Some ticket",
                     location_x=52.225123,
                     location_y=21.031186,
                     city="Warsaw",
@@ -61,6 +63,7 @@ async def main() -> None:
                     user_id=ticket_owner.id,
                 ),
                 TicketModel(
+                    title="Some ticket",
                     location_x=50.061426,
                     location_y=19.932629,
                     city="Krakow",
@@ -69,6 +72,7 @@ async def main() -> None:
                     user_id=ticket_owner.id,
                 ),
                 TicketModel(
+                    title="Some ticket",
                     location_x=50.061426,
                     location_y=19.932629,
                     city="Krakow",
@@ -77,6 +81,7 @@ async def main() -> None:
                     user_id=ticket_owner.id,
                 ),
                 TicketModel(
+                    title="Some ticket",
                     location_x=50.293930,
                     location_y=18.665396,
                     city="Gliwice",
@@ -88,6 +93,7 @@ async def main() -> None:
         )
         await session.commit()
         ticket_with_services = TicketModel(
+            title="Some ticket title",
             location_x=50.540650,
             location_y=22.721789,
             city="Bilgoraj",
