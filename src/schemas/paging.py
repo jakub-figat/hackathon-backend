@@ -30,8 +30,8 @@ class PaginatedResponseSchema(GenericModel, Generic[ResponseSchema], BaseModel):
     @classmethod
     def from_results(cls, results: list[ResponseSchema], page_number: int) -> "PaginatedResponseSchema":
         return cls(
-            count=len(results[:-1]),
+            count=len(results[: settings.page_size * page_number]),
             page_number=page_number,
             has_next_page=len(results) > settings.page_size,
-            results=results[:-1] if len(results) > 1 else results,
+            results=results[: settings.page_size * page_number] if len(results) > 1 else results,
         )

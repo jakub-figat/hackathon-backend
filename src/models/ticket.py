@@ -27,4 +27,4 @@ class TicketModel(Base):
     valid_until = Column(DateTime, nullable=False)
     user_id = Column(ForeignKey("usermodels.id"), nullable=False)
 
-    services = relationship("VolunteerServiceModel", secondary=ticket_to_volunteer_service, lazy="selectin")
+    services = relationship("VolunteerServiceModel", secondary=ticket_to_volunteer_service, lazy="raise")
