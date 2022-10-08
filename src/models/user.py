@@ -4,6 +4,7 @@ from sqlalchemy import (
     Date,
     String,
 )
+from sqlalchemy.orm import relationship
 
 from src.db import Base
 from src.enums.roles import UserRole
@@ -19,3 +20,10 @@ class UserModel(Base):
     image = Column(String(), nullable=True)
     is_verified = Column(Boolean(), nullable=False, default=False)
     role = Column(String(20), nullable=False, default=UserRole.STANDARD.value)
+
+    send_requests = relationship(
+        "ChatRequestModel", back_populates="requester", foreign_keys="ChatRequestModel.requester_id"
+    )
+    requests = relationship(
+        "ChatRequestModel", back_populates="requested", foreign_keys="ChatRequestModel.requested_id"
+    )

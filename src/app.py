@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.routes.chat import chat_router
 from src.routes.services import service_router
 from src.routes.ticket import ticket_router
 from src.routes.token import token_router
@@ -24,8 +25,4 @@ app.include_router(router=token_router, prefix="/token")
 app.include_router(router=volunteer_profile_router, prefix="/volunteers")
 app.include_router(router=ticket_router, prefix="/tickets")
 app.include_router(router=service_router, prefix="/services")
-
-
-# TODO: heading to ticket
-# TODO: permissions with tickets
-# TODO: volunteer rating and volunteer finished tickets
+app.include_router(router=chat_router, prefix="/chats")
