@@ -108,7 +108,7 @@ class VolunteerProfileDataAccess(
 
         if services_ids:
             profiles_to_services = [(str(profile_id), str(service_id)) for service_id in services_ids]
-            await self._session.execute(insert(volunteer_profile_to_service).values(*profiles_to_services))
+            await self._session.execute(insert(volunteer_profile_to_service).values(profiles_to_services))
         await self._session.commit()
 
     @property
