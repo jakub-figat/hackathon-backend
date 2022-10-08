@@ -1,16 +1,29 @@
+import random
+from datetime import (
+    datetime,
+    timedelta,
+)
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import (
+    Depends,
+    HTTPException,
+)
 
 from src.data_access.user import UserDataAccess
 from src.schemas.user import data_access as data_access_schemas
-from src.schemas.user.data_access import UserInputSchema
+from src.schemas.user.data_access import (
+    UserInputSchema,
+    UserSchema,
+    UserUpdateSchema,
+)
 from src.schemas.user.dto import (
     UserRegisterSchema,
     UserResponseSchema,
-    UserUpdateSchema,
 )
+from src.settings import settings
 from src.utils.password import password_context
+from src.utils.sns import send_otp
 
 
 class UserService:
@@ -20,14 +33,61 @@ class UserService:
     async def register_user(self, input_schema: UserRegisterSchema) -> UserResponseSchema:
         input_schema.password = password_context.hash(input_schema.password)
         return UserResponseSchema.from_orm(
-            await self._user_data_access.register_user(input_schema=UserInputSchema.parse_obj(input_schema))
+            await self._user_data_access.register_user(
+                input_schema=UserInputSchema.parse_obj({**input_schema.dict(), "is_verified": False})
+            )
         )
 
     async def get_user(self, user_id: UUID) -> UserResponseSchema:
         return UserResponseSchema.from_orm(await self._user_data_access.get_by_id(id=user_id))
 
-    async def update_user(self, update_schema: UserUpdateSchema, user_id: UUID) -> UserResponseSchema:
-        update_schema = data_access_schemas.UserUpdateSchema(**update_schema.dict())
+    async def update_user(
+        self, user: UserSchema, update_schema: UserUpdateSchema, user_id: UUID
+    ) -> UserResponseSchema:
+        update_schema = data_access_schemas.UserUpdateSchema(**update_schema.dict(), is_verified=user.is_verified)
         return UserResponseSchema.from_orm(
             await self._user_data_access.update(update_schema=update_schema, id=user_id)
+        )
+
+    async def generate_otp(self, user: UserSchema) -> None:
+        if user.phone_number is None:
+            raise HTTPException(status_code=400, detail="You need to provide a phone number before")
+
+        if user.is_verified:
+            raise HTTPException(status_code=400, detail="Your account is verified")
+
+        otp_code = random.randint(100000, 999999)
+        otp_code_issued_at = datetime.utcnow()
+
+        await self._user_data_access.update(
+            update_schema=UserUpdateSchema(
+                **{
+                    **user.dict(),
+                    "otp_code": otp_code,
+                    "otp_code_issued_at": otp_code_issued_at,
+                }
+            ),
+            id=user.id,
+        )
+
+        if settings.debug:
+            print(f"OTP: {otp_code}")
+        else:
+            await send_otp(phone_number=user.phone_number, otp=otp_code)
+
+    async def confirm_otp(self, user: UserSchema, otp: int) -> None:
+        if user.is_verified:
+            raise HTTPException(status_code=400, detail="Your account is verified")
+
+        if user.otp_code != otp or user.otp_code_issued_at + timedelta(minutes=5) < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Invalid OTP code")
+
+        await self._user_data_access.update(
+            update_schema=UserUpdateSchema(
+                **{
+                    **user.dict(),
+                    "is_verified": True,
+                }
+            ),
+            id=user.id,
         )

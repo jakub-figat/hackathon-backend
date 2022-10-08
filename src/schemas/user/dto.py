@@ -3,6 +3,7 @@ import re
 from typing import Optional
 from uuid import UUID
 
+from pydantic import conint
 from pydantic.class_validators import validator
 from pydantic.fields import Field
 from pydantic.networks import EmailStr
@@ -65,3 +66,8 @@ class UserResponseSchema(BaseModel):
     first_name: str
     last_name: str
     phone_number: Optional[str]
+    is_verified: bool
+
+
+class OTPConfirmRequest(BaseModel):
+    otp: conint(ge=100000, le=999999)
