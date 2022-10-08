@@ -33,7 +33,7 @@ class TicketDataAccess(BaseAsyncPostgresDataAccess[TicketModel, TicketInputSchem
 
         if services_ids:
             profiles_to_services = [(str(ticket_id), str(service_id)) for service_id in services_ids]
-            await self._session.execute(insert(ticket_to_volunteer_service).values(*profiles_to_services))
+            await self._session.execute(insert(ticket_to_volunteer_service).values(profiles_to_services))
         await self._session.commit()
 
     def _apply_valid_time_range_to_where_clause(self, statement, valid_from: dt.time | None, valid_to: dt.time | None):
