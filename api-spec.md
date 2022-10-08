@@ -193,3 +193,16 @@ phone confirmation, location, websocket chat,
 
 Debilo: phone confirmation, chat & websocket
 Drugi debilo: user, token, volunteer, ticket
+
+PROTECTED ROUTES:
+POST /users/me/
+POST/PUT /volunteers/
+POST: TicketInput /tickets/ -> Ticket
+PUT: TicketInput /tickets/<uuid>/ -> Ticket
+DELETE /tickets/<uuid>/ -> 204 No Content
+
+POST: ChatCreateInput /chats/ -> Chat
+PUT: ChatAcceptInput /chats/<uuid>/ -> Chat
+
+GET /chats/?PaginationParams -> PaginatedResponse<Chat>
+GET /chats/<uuid>/messages/?PaginationParams -> PaginatedResponse<Message>
