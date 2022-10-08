@@ -18,7 +18,7 @@ async def save_image_locally(image_uuid: UUID, image_file: UploadFile) -> str:
     with open(file_path, "wb") as file:
         file.write(await image_file.read())
 
-    return file_path
+    return f"{settings.domain}/static/{file_path.split('/')[-1]}"
 
 
 async def upload_image_to_s3(image_uuid: UUID, image_file: UploadFile) -> str:

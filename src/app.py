@@ -7,9 +7,13 @@ from src.routes.token import token_router
 from src.routes.user import user_router
 from src.routes.volunteer_profile import volunteer_profile_router
 from src.settings import settings
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
+
+if settings.debug:
+    app.mount("/static", StaticFiles(directory="/var/www/media/"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
