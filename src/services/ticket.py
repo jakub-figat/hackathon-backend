@@ -28,7 +28,6 @@ class TicketService:
         tickets = await self._ticket_data_access.filter_by_params(
             limit=limit, offset=offset, filter_params=filter_params
         )
-        print(tickets)
         return [TicketSchema.from_orm(ticket) for ticket in tickets]
 
     async def create_ticket(self, schema: TicketInputSchema, user_id: UUID) -> TicketSchema:

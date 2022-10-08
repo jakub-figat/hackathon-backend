@@ -35,7 +35,6 @@ ticket_router = APIRouter(tags=["tickets"])
     "/",
     status_code=status.HTTP_200_OK,
     response_model=PaginatedResponseSchema[TicketSchema],
-    dependencies=[Depends(require_auth)],
 )
 async def get_tickets(
     location: tuple[float, float] | None = Query(None),
@@ -51,7 +50,7 @@ async def get_tickets(
 
 
 @ticket_router.get(
-    "/{ticket_id}/", status_code=status.HTTP_200_OK, response_model=TicketSchema, dependencies=[Depends(require_auth)]
+    "/{ticket_id}/", status_code=status.HTTP_200_OK, response_model=TicketSchema
 )
 async def get_ticket(ticket_id: UUID, ticket_service: TicketService = Depends()) -> TicketSchema:
     try:

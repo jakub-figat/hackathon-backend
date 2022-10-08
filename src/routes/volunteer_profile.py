@@ -37,7 +37,6 @@ volunteer_profile_router = APIRouter(tags=["volunteer_profiles"])
     "/",
     response_model=PaginatedResponseSchema[VolunteerProfileSchema],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_auth)],
 )
 async def get_volunteer_profiles(
     location: tuple[float, float] | None = Query(None),
@@ -61,7 +60,6 @@ async def get_volunteer_profiles(
     "/{profile_id}",
     response_model=VolunteerProfileSchema,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(require_auth)],
 )
 async def get_volunteer_profile(
     profile_id: UUID,
