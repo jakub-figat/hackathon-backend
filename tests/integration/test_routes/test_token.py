@@ -25,6 +25,7 @@ def register_schema() -> UserInputSchema:
         password="password12345678",
         first_name="Jacek",
         last_name="Gardziel",
+        is_verified=False,
     )
 
 

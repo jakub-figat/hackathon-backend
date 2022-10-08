@@ -11,6 +11,7 @@ from src.deps.jwt import get_request_user
 from src.exceptions.data_access import ObjectAlreadyExists
 from src.schemas.user.data_access import UserSchema
 from src.schemas.user.dto import (
+    OTPConfirmRequest,
     UserRegisterSchema,
     UserResponseSchema,
     UserUpdateSchema,
@@ -44,7 +45,19 @@ async def update_user(
     user: UserSchema = Depends(get_request_user),
     user_service: UserService = Depends(),
 ) -> UserResponseSchema:
-    return await user_service.update_user(update_schema=update_schema, user_id=user.id)
+    return await user_service.update_user(user=user, update_schema=update_schema, user_id=user.id)
+
+
+@user_router.post("/me/generate-otp/", status_code=status.HTTP_204_NO_CONTENT)
+async def generate_otp(user: UserSchema = Depends(get_request_user), user_service: UserService = Depends()):
+    return await user_service.generate_otp(user=user)
+
+
+@user_router.post("/me/confirm-otp/", status_code=status.HTTP_204_NO_CONTENT)
+async def generate_otp(
+    schema: OTPConfirmRequest, user: UserSchema = Depends(get_request_user), user_service: UserService = Depends()
+):
+    return await user_service.confirm_otp(user=user, otp=schema.otp)
 
 
 @user_router.put("/me/image/", status_code=status.HTTP_200_OK)

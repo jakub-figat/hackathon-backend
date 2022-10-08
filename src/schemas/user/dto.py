@@ -1,9 +1,12 @@
 import datetime as dt
+import re
+from typing import Optional
 from uuid import UUID
 
 from pydantic.class_validators import validator
 from pydantic.fields import Field
 from pydantic.networks import EmailStr
+from pydantic.types import conint
 
 from src.schemas.base import BaseModel
 
@@ -36,6 +39,7 @@ class UserUpdateSchema(BaseModel):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    phone_number: Optional[str]
 
     @validator("date_of_birth")
     def validate_date_of_birth(cls, date_of_birth: dt.date) -> dt.date:
@@ -43,6 +47,16 @@ class UserUpdateSchema(BaseModel):
             raise ValueError("Invalid date of birth")
 
         return date_of_birth
+
+    @validator("phone_number")
+    def phone_validation(cls, v):
+        if v is None:
+            return v
+
+        regex = r"^(\+)[1-9][0-9\-\(\)\.]{9,15}$"
+        if not re.search(regex, v, re.I):
+            raise ValueError("Phone Number Invalid.")
+        return v
 
 
 class UserResponseSchema(BaseModel):
@@ -52,3 +66,9 @@ class UserResponseSchema(BaseModel):
     first_name: str
     last_name: str
     image: str | None = None
+    phone_number: Optional[str]
+    is_verified: bool
+
+
+class OTPConfirmRequest(BaseModel):
+    otp: conint(ge=100000, le=999999)

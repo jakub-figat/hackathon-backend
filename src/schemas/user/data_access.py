@@ -1,11 +1,11 @@
 import datetime as dt
-from typing import Any
+from typing import (
+    Any,
+    Optional,
+)
 from uuid import UUID
 
-from pydantic import (
-    EmailStr,
-    validator,
-)
+from pydantic import EmailStr
 
 from src.schemas.base import BaseModel
 from src.utils.schemas import BaseInputSchema
@@ -17,24 +17,23 @@ class UserInputSchema(BaseInputSchema):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    is_verified: bool
 
     def to_orm_kwargs(self) -> dict[str, Any]:
-        return {
-            "email": self.email,
-            "password": self.password,
-            "date_of_birth": self.date_of_birth,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-        }
+        return self.dict()
 
 
 class UserUpdateSchema(BaseInputSchema):
     date_of_birth: dt.date
     first_name: str
     last_name: str
+    phone_number: Optional[str]
+    otp_code: Optional[int]
+    otp_code_issued_at: Optional[dt.datetime]
+    is_verified: bool
 
     def to_orm_kwargs(self) -> dict[str, Any]:
-        return {"first_name": self.first_name, "last_name": self.last_name, "date_of_birth": self.date_of_birth}
+        return self.dict()
 
 
 class UserSchema(BaseModel):
@@ -45,3 +44,7 @@ class UserSchema(BaseModel):
     first_name: str
     last_name: str
     image: str | None = None
+    is_verified: bool
+    phone_number: Optional[str]
+    otp_code: Optional[int]
+    otp_code_issued_at: Optional[dt.datetime]
