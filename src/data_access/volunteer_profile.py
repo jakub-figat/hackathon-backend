@@ -16,6 +16,7 @@ from src import VolunteerProfileModel
 from src.data_access.base import BaseAsyncPostgresDataAccess
 from src.exceptions.data_access import ObjectNotFound
 from src.models.volunteer_profile import volunteer_profile_to_service
+from src.models.volunteer_review import VolunteerReviewModel
 from src.schemas.volunteer_profile.data_access import (
     VolunteerProfileInputSchema,
     VolunteerProfileSchema,
@@ -73,7 +74,6 @@ class VolunteerProfileDataAccess(
         if (location := params_dict.pop("location")) is not None:
             statement = self._apply_location_to_where_clause(statement=statement, location=location)
 
-        print(params_dict["services_ids"], "@@@@@@@@")
         if len(services_ids := params_dict.pop("services_ids")):
             profile_service_ids = (
                 select(
@@ -113,4 +113,15 @@ class VolunteerProfileDataAccess(
 
     @property
     def _base_select(self):
-        return super()._base_select.options(selectinload(self._model.services))
+        table = VolunteerReviewModel.__table__
+        aggregates = (
+            select(table.c.volunteer_profile_id, func.coalesce(func.avg(table.c.rate), 0).label("rate"))
+            .group_by(table.c.volunteer_profile_id)
+            .subquery()
+        )
+
+        return (
+            select(self._model, aggregates.c.rate)
+            .options(selectinload(self._model.services))
+            .join(aggregates, self._model.id == aggregates.c.volunteer_profile_id, isouter=True)
+        )

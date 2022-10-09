@@ -1,5 +1,8 @@
 import datetime as dt
-from typing import Any
+from typing import (
+    Any,
+    Type,
+)
 from uuid import UUID
 
 from src.schemas.base import BaseModel

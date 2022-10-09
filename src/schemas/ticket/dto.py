@@ -7,6 +7,7 @@ from uuid import UUID
 
 import pydantic
 from pydantic.class_validators import validator
+from pydantic.fields import Field
 
 from src.schemas.base import BaseModel
 from src.schemas.service.dto import VolunteerServiceSchema

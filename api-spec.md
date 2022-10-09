@@ -200,6 +200,8 @@ POST/PUT /volunteers/
 POST: TicketInput /tickets/ -> Ticket
 PUT: TicketInput /tickets/<uuid>/ -> Ticket
 DELETE /tickets/<uuid>/ -> 204 No Content
+PATCH /tickets/<ticket_id>/cancel/
+PATCH /tickets/<ticket_id>/accept/
 
 POST: ChatCreateInput /chats/ -> Chat
 PUT: ChatAcceptInput /chats/<uuid>/ -> Chat

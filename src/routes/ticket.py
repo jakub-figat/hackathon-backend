@@ -18,6 +18,7 @@ from src.schemas.paging import (
     PaginatedResponseSchema,
     PagingInputParams,
 )
+from src.schemas.review import ReviewInputSchema
 from src.schemas.ticket.dto import (
     TicketFilterParams,
     TicketInputSchema,
@@ -25,6 +26,7 @@ from src.schemas.ticket.dto import (
     TicketSchema,
 )
 from src.schemas.user.dto import UserResponseSchema
+from src.services.review import VolunteerReviewService
 from src.services.ticket import TicketService
 
 
@@ -80,6 +82,27 @@ async def update_ticket(
         return await ticket_service.update_ticket(schema=schema, ticket_id=ticket_id, user_id=user.id)
     except ObjectNotFound as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+
+
+@ticket_router.patch("/{ticket_id}/cancel/", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_ticket(
+    ticket_id: UUID, ticket_service: TicketService = Depends(), user: UserResponseSchema = Depends(get_request_user)
+) -> Response:
+    await ticket_service.cancel_ticket(ticket_id=ticket_id, user_id=user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@ticket_router.patch("/{ticket_id}/finish/", status_code=status.HTTP_204_NO_CONTENT)
+async def finish_ticket(
+    ticket_id: UUID,
+    schema: ReviewInputSchema,
+    ticket_service: TicketService = Depends(),
+    review_service: VolunteerReviewService = Depends(),
+    user: UserResponseSchema = Depends(),
+) -> Response:
+    await ticket_service.finish_ticket(ticket_id=ticket_id, user_id=user.id)
+    await review_service.add_review(schema=schema, reviewer_id=user.id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @ticket_router.delete("/{ticket_id}/", status_code=status.HTTP_204_NO_CONTENT)

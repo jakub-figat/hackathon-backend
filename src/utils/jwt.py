@@ -28,7 +28,7 @@ def generate_token_pair(user_id: uuid.UUID) -> TokenPairSchema:
             claims={
                 "jti": str(uuid.uuid4()),
                 "type": TokenType.access.value,
-                "exp": datetime + dt.timedelta(settings.token_expiration_time),
+                "exp": datetime + dt.timedelta(minutes=settings.token_expiration_time),
                 **token_data,
             },
             key=settings.token_secret_key,
@@ -37,7 +37,7 @@ def generate_token_pair(user_id: uuid.UUID) -> TokenPairSchema:
             claims={
                 "jti": str(uuid.uuid4()),
                 "type": TokenType.refresh.value,
-                "exp": datetime + dt.timedelta(settings.refresh_expiration_time),
+                "exp": datetime + dt.timedelta(minutes=settings.refresh_expiration_time),
                 **token_data,
             },
             key=settings.token_secret_key,

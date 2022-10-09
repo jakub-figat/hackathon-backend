@@ -30,3 +30,4 @@ class VolunteerProfileModel(Base):
     working_to = Column(Time, nullable=False)
 
     services = relationship("VolunteerServiceModel", secondary=volunteer_profile_to_service, lazy="raise")
+    reviews = relationship("VolunteerReviewModel", lazy="raise")

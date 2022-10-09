@@ -37,3 +37,6 @@ app.include_router(router=city_router, prefix="/cities")
 @app.get("/health", status_code=200)
 async def health_check():
     return {"msg": "I'm alive!"}
+
+
+# TODO: cookie expire is fishy

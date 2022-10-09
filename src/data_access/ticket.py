@@ -14,6 +14,7 @@ from sqlalchemy.orm import selectinload
 
 from src import TicketModel
 from src.data_access.base import BaseAsyncPostgresDataAccess
+from src.enums.ticket import TicketStatus
 from src.models.ticket import ticket_to_volunteer_service
 from src.schemas.ticket.data_access import (
     TicketInputSchema,
@@ -91,7 +92,8 @@ class TicketDataAccess(BaseAsyncPostgresDataAccess[TicketModel, TicketInputSchem
 
         statement = (
             statement.where(
-                and_(*(getattr(self._model, key) == value for key, value in params_dict.items() if value is not None))
+                and_(*(getattr(self._model, key) == value for key, value in params_dict.items() if value is not None)),
+                self._model.status == TicketStatus.PENDING.value,
             )
             .limit(limit)
             .offset(offset)
